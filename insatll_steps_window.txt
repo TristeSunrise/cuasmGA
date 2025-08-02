@@ -1,0 +1,15 @@
+git clone https://github.com/hgl71964/CuAssembler.git
+#export PATH=${PATH}:$(pwd)/bin
+#export PYTHONPATH=${PYTHONPATH}:$(pwd):$(pwd)/bin:$(pwd)/CuAsmexport PYTHONPATH=${PYTHONPATH}:$(pwd):$(pwd)/bin:$(pwd)/CuAsm
+
+conda install --file requirements.txt
+conda install sympy
+pip install pyelftools
+
+cd CuAssembler
+pip install -e .
+
+
+
+
+
