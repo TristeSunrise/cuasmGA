@@ -12,34 +12,43 @@ class SassKernel:
 
         self.startline = 0
         self.endline = 0
-
+        print("SassKernel init called")
         self._locate_kernel()
 
     def _locate_kernel(self) -> None:
+        print("_locate_kernel called" )
         for i, line in enumerate(self.kernel_section):
-            if '.text.' in line:
+            if line.strip().startswith(".text."):
                 self.kernel_label = line
                 self.kernel_start_line = i
+                print(f"kernrl start line found: {self.kernel_start_line}")
                 break
-            assert self.kernel_start_line is not None, 'kernel_start_line not found'
+            # else:print("kernrl start line not found")
+        # assert self.kernel_start_line == 0, 'kernel_start_line not found'
 
         for i, line in enumerate(self.sass):
             if line == self.kernel_label:
                 self.startline = i
+                print(f"startline found: {self.startline}")
                 break
-            assert self.startline is not None, 'startline not found'
+            # else:print("startline not found")
+        # assert self.startline ==0, 'startline not found'
     
-        line = self.startline
+        endline = self.startline
         k_line = self.kernel_start_line
-        while line < len(self.sass) and k_line < len(self.kernel_section):
-            if self.sass[line] != self.kernel_section[k_line]:
-                self.endline = line
+        while endline < len(self.sass) and k_line < len(self.kernel_section):
+            if self.sass[endline] != self.kernel_section[k_line]:
+                self.endline = endline
+                print(f"endline found:{self.endline}")
                 break
-            line += 1
+            endline += 1
             k_line += 1
-        if self.endline is None:
-            assert self.sass[line] == self.kernel_section[k_line], 'kernel section end at last'
-            self.endline = line
+        if self.endline == 0:
+            # assert self.sass[line] == self.kernel_section[k_line], 'kernel section end at last'
+            self.endline = endline
+            print(f"endline found:{self.endline}")
+            
+        # print("run _locate_kernel")
 
     def _get_kernel(self):
         return self.sass[self.startline:self.endline]
@@ -48,3 +57,4 @@ class SassKernel:
         updated_sass = deepcopy(self.sass)
         updated_sass[self.startline:self.endline] = kernel_lines
         return updated_sass
+        

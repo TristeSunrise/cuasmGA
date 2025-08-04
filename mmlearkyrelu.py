@@ -14,8 +14,8 @@ def leaky_relu(x):
     x = x + 1
     return tl.where(x >= 0, x, 0.01 * x)
 
-def matmul(a, b, c, kernel, M, N, K, grid, load, activation=""):
-    kernel[grid](
+def tt_matmul(a, b, c, M, N, K, grid, activation=""):
+    tt_kernel[grid](
         a, b, c,  #
         M, N, K,  #
         a.stride(0), a.stride(1),  #
