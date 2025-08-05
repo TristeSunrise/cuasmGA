@@ -1,8 +1,9 @@
 from collections import Counter
 import random
-from typing import Optional
+from typing import Callable, Optional
 from sass_kernel import SassKernel
 from sassgen import extract_kernel_sass, write_sass_file
+
 
 POP_SIZE = 10   #population size
 MUTATION_RATE = 0.1
@@ -14,20 +15,22 @@ class Individual:
         self.sass = kernel_section  # List of instructions (strings)
         self.fitness: Optional[float] = None
 
+
 class GeneticAlgorithm:
     original_kernel_section: Optional[list] = None
-    def __init__(self, kernel_section):
+
+    def __init__(self, kernel_section,test_correctness,test_performance):
         self.original_kernel_section = kernel_section
         self.counter = Counter(kernel_section)
+        self.test_correctness: Callable[[Individual], bool] = test_correctness
+        self.test_performance: Callable[[Individual], float]= test_performance
     def evaluate_fitness(self,individual) -> float:
-        fitness = 0
+        fitness = self.test_performance(individual)
         return fitness
         # cubin = write_sass_file(individual.sass)  # write back to cubin
         # run_benchmark(cubin)
     # def run_benchmark(cubin):
-    #     return 
-    def test_ok(self,individual):
-        return True
+
 
 
     def initialize_population(self,original_kernel_section): 
@@ -114,6 +117,7 @@ class GeneticAlgorithm:
             population = next_gen
         
         best = min(population, key = lambda x: x.fitness)
+        
         
         return best
             

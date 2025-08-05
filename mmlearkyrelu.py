@@ -1,5 +1,8 @@
+import argparse
+from dataclasses import dataclass
 import os
 import random
+from typing import Optional
 import numpy as np
 import torch
 
@@ -7,7 +10,39 @@ print(torch.__version__)
 import triton
 import triton.language as tl
 
-print(triton.__version__)
+#print(triton.__version__)
+
+@dataclass
+class Config:
+    # Kernel
+    default_out_path: str = "data"
+    seed: int = 1337
+    n_tests: int = 2
+    load: Optional[str] = None
+    bench: int = 0
+
+    # Workload
+    m: int = 1
+    n: int = 1
+    k: int = 1
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out-path", type=str, default=Config.default_out_path)
+    parser.add_argument("--seed", type=int, default=Config.seed)
+    parser.add_argument("--n-tests", type=int, default=Config.n_tests)
+    parser.add_argument("--load", type=str, default=Config.load)
+
+    parser.add_argument("-m", type=int, default=512)
+    parser.add_argument("-n", type=int, default=512)
+    parser.add_argument("-k", type=int, default=2048)
+
+    args = parser.parse_args()
+    config = Config(**vars(args))
+    return config
+
+
 
 @triton.jit
 def leaky_relu(x):
@@ -25,6 +60,32 @@ def tt_matmul(a, b, c, M, N, K, grid, activation=""):
     )
     return c
 
+# # @triton.autotune(
+# @triton_autotune_with_cache(
+#     configs=[
+#         triton.Config({'BLOCK_SIZE_M': 128, 'BLOCK_SIZE_N': 256, 'BLOCK_SIZE_K': 64, 'GROUP_SIZE_M': 8}, num_stages=1,
+#                         num_warps=8),
+#         triton.Config({'BLOCK_SIZE_M': 64, 'BLOCK_SIZE_N': 256, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=4,
+#                         num_warps=4),
+#         triton.Config({'BLOCK_SIZE_M': 128, 'BLOCK_SIZE_N': 128, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=4,
+#                         num_warps=4),
+#         triton.Config({'BLOCK_SIZE_M': 128, 'BLOCK_SIZE_N': 64, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=4,
+#                         num_warps=4),
+#         triton.Config({'BLOCK_SIZE_M': 64, 'BLOCK_SIZE_N': 128, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=4,
+#                         num_warps=4),
+#         triton.Config({'BLOCK_SIZE_M': 128, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=4,
+#                         num_warps=4),
+#         triton.Config({'BLOCK_SIZE_M': 64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=5,
+#                         num_warps=2),
+#         triton.Config({'BLOCK_SIZE_M': 32, 'BLOCK_SIZE_N': 64, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=5,
+#                         num_warps=2),
+#         triton.Config({'BLOCK_SIZE_M': 64, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 32, 'GROUP_SIZE_M': 8}, num_stages=2,
+#                     num_warps=2),
+#     ],
+#     key=['M', 'N', 'K'],
+
+#     drl_config=config,  # just need the path really
+# )
 @triton.jit
 def tt_kernel(
         # Pointers to matrices
@@ -102,3 +163,16 @@ def tt_kernel(
     c_mask = (offs_cm[:, None] < M) & (offs_cn[None, :] < N)
     tl.store(c_ptrs, c, mask=c_mask)
 
+def main():
+    config  = parse_args()
+
+    random.seed(config.seed)
+    np.random.seed(config.seed)
+    torch.manual_seed(config.seed)
+
+    M, N, K = config.m, config.n, config.k
+    a = torch.randn((M, K), device='cuda', dtype=torch.float16)
+    b = torch.randn((K, N), device='cuda', dtype=torch.float16)
+    c = torch.empty((M, N), device=a.device, dtype=a.dtype)
+
+    #TODO: entry the kernel and test benckmark
