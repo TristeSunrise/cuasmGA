@@ -1,0 +1,3 @@
+[submodule "CuAssembler"]
+	path = CuAssembler
+	url = https://github.com/hgl71964/CuAssembler.git
