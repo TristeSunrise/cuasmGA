@@ -40,17 +40,9 @@ def extract_kernel_sass_from_bin(bin):
         cubin = bin.asm['cubin']
         temp_file.write(cubin)
         temp_filename = temp_file.name
-        # Ensure data is written to the file before reading it
-        temp_file.flush()
-        temp_file.seek(0)
-
-        time.sleep(1)
-        
-    try:
         cf = CubinFile(temp_filename)
         #todo : rename the var
         text_buffer_1, text_buffer_2 = cf.dump_sass()
-        
         sass = text_buffer_1.getvalue().split('\n')
         kernel_section = text_buffer_2.getvalue().split('\n')
         # print(type(kernel_section))
@@ -63,8 +55,7 @@ def extract_kernel_sass_from_bin(bin):
         # with open('kernel_section_dump.txt', 'w', encoding='utf-8') as f:
         #     f.write('\n'.join(kernel_section))
         return sass, kernel_section  
-    finally:
-        os.unlink(temp_filename)
+
 
 
 def write_sass_file(updated_sass):
