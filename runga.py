@@ -17,6 +17,7 @@ from ga import GeneticAlgorithm
 # mutation
 from logger import get_logger
 # from cuasmrl.utils.record import save_data, read_data
+from record import save_data
 from sass_kernel import SassKernel
 from sassgen import extract_kernel_sass_from_bin, write_sass_file
 from verify import test_via_cubin, gen_test_samples
@@ -136,6 +137,9 @@ def run_ga(
     cubin = write_sass_file(sass)
     asm['cubin'] = cubin
     bin.asm['cubin'] = cubin
+
+    save_path = os.path.join(config.default_out_path, config.save_dir)
+    save_data(bin, best.fitness, save_path)
     
 
 

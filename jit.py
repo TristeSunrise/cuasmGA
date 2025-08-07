@@ -2,6 +2,7 @@ import sys
 from collections import defaultdict, namedtuple
 
 from runga import run_ga
+from sassgen import run_selection
 from triton.runtime.jit import T, JITFunction, KernelArg, get_current_device, set_current_device, get_cuda_stream
 from triton.compiler.compiler import CompiledKernel, compile, get_arch_default_num_stages, get_arch_default_num_warps
 from triton.common.backend import get_backend, get_cuda_version_key
@@ -80,6 +81,7 @@ class ASMJITFunction(JITFunction):
         device_type = get_special_arg("device_type")
 
         ret_ptr = get_special_arg("ret_ptr")
+        load_dir = get_special_arg("load_dir")
 
         # Bind the remaining arguments to `fn`.
         bound_args = self.signature.bind(*args, **kwargs)
@@ -219,29 +221,30 @@ class ASMJITFunction(JITFunction):
                 device_type=device_type,
             )
             
-            bin = fgk_CompiledKernel(so_path, metadata, asm)
-            print(f"bin from fgk_CompiledKernel: {bin}")
-            run_ga(
-                bin,
-                so_path,
-                metadata,
-                asm,
-                ret_ptr,
-                args,
-                sig_key,
-                non_constexpr_arg_values,
-                grid_0,
-                grid_1,
-                grid_2,
-                stream,  #
-                CompiledKernel.launch_enter_hook,
-                CompiledKernel.launch_exit_hook,  #
-                # others
-                self.ga_config,  # <- init by the autotuner
-            )
-            # print(f"bin after run_drl: {bin}")
-            sys.exit(0)  # signal that training is ok
-           
+            if load_dir is None:
+                bin = fgk_CompiledKernel(so_path, metadata, asm)
+                print(f"bin from fgk_CompiledKernel: {bin}")
+                run_ga(
+                    bin,
+                    so_path,
+                    metadata,
+                    asm,
+                    ret_ptr,
+                    args,
+                    sig_key,
+                    non_constexpr_arg_values,
+                    grid_0,
+                    grid_1,
+                    grid_2,
+                    stream,  #
+                    CompiledKernel.launch_enter_hook,
+                    CompiledKernel.launch_exit_hook,  #
+                    # others
+                    self.ga_config,  # <- init by the autotuner
+                )
+                sys.exit(0)  # signal that training is ok
+            else:
+                bin = run_selection(cubin_dir_path=load_dir)
             warn = '\033[93m'
             end = '\033[0m'
             print(f"{warn}SIP JIT{end}")
@@ -267,6 +270,7 @@ class ASMJITFunction(JITFunction):
                 *bin.assemble_tensormap_to_arg(non_constexpr_arg_values),
             )
         return bin
+
 
     def run(self, *args, **kwargs):
         return self.search(*args, **kwargs)

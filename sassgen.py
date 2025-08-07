@@ -2,6 +2,7 @@ import pickle
 import os
 import tempfile
 import time
+from venv import logger
 from CuAsm.CubinFile import CubinFile
 from CuAsm.CuAsmParser import CuAsmParser
 
@@ -80,5 +81,17 @@ def write_sass_file(updated_sass):
     
     return cubin
 
+def run_selection(cubin_dir_path):
+    data = None
+    if os.listdir(cubin_dir_path) is not None:
+        for i, file in enumerate(os.listdir(cubin_dir_path)):
+            if file == 'cache_config.pkl':
+                continue
+            if not file.endswith('.pkl'):
+                continue
+            with open(os.path.join(cubin_dir_path, file), 'rb') as f:
+                data = pickle.load(f)
+                return data['cubin']
+        
+        logger.info(f"No cache found in {cubin_dir_path}")
     
-
