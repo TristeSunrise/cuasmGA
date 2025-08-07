@@ -21,6 +21,7 @@ from record import save_data
 from sass_kernel import SassKernel
 from sassgen import extract_kernel_sass_from_bin, write_sass_file
 from verify import test_via_cubin, gen_test_samples
+from triton.testing import do_bench
 
 logger = get_logger(__name__)
 
