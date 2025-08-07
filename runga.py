@@ -122,7 +122,7 @@ def run_ga(
         if config.total_flops is not None:
             tflops = config.total_flops / ms * 1e-9
             # print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
-            return tflops, cubin
+            return tflops
 
         # print(f'ms: {ms:.3f};')
         raise NotImplementedError()
