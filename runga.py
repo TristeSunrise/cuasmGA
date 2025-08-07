@@ -21,7 +21,7 @@ from record import save_data
 from sass_kernel import SassKernel
 from sassgen import extract_kernel_sass_from_bin, write_sass_file
 from verify import test_via_cubin, gen_test_samples
-from triton.testing import do_bench
+import triton.testing
 
 logger = get_logger(__name__)
 
@@ -69,6 +69,9 @@ def run_ga(
         launch_exit_hook,
     )
 
+    sass, kernel_section = extract_kernel_sass_from_bin(bin)
+    sasskernel = SassKernel(sass, kernel_section)
+    
     #TODO: test performance
     def test_performance(individual):
         assemble_ok = True
@@ -126,11 +129,9 @@ def run_ga(
 
 
 
-    sass, kernel_section = extract_kernel_sass_from_bin(bin)
-    sasskernel = SassKernel(sass, kernel_section)
+
+
     pure_kernel_section = sasskernel._get_kernel()
-
-
     ga = GeneticAlgorithm(pure_kernel_section,test_correctness, test_performance)
     best = ga.run_ga(pure_kernel_section)
 

@@ -38,6 +38,8 @@ class GeneticAlgorithm:
         population = []
         for _ in range(POP_SIZE):
             shuffled = random.sample(original_kernel_section, len(original_kernel_section))
+            if Counter(shuffled) != self.counter:
+                print(f"counter false")
             population.append(Individual(shuffled))
         return population
 
@@ -62,6 +64,7 @@ class GeneticAlgorithm:
             if child1_sass[i] is None:
                 child1_sass[i] = remainingp2[fill_idx]
                 fill_idx += 1
+        if fill_idx > len(remainingp2): print("error: fill_idx = len(remainingp1)")
         #create child2
         child2_sass = [None] * size
         child2_sass[point1:point2] = parent2.sass[point1:point2]
@@ -71,6 +74,7 @@ class GeneticAlgorithm:
             if child2_sass[i] is None:
                 child2_sass[i] = remainingp1[fill_idx]
                 fill_idx += 1
+        if fill_idx > len(remainingp1): print("error: fill_idx = len(remainingp1)")
         if Counter(child1_sass) == self.counter:
             child1 = Individual(child1_sass)
         # child1,child2 = Individual(child1_sass),Individual(child2_sass)
@@ -99,7 +103,7 @@ class GeneticAlgorithm:
             individual.fitness = self.evaluate_fitness(individual)
         
         for gen in range(NUM_GENERATIONS):
-            print(f"GEN {gen} best fitness: {min(population, key=lambda x: x.fitness)} ")
+            print(f"GEN {gen} best fitness: {min(individual.fitness for individual in population)} ")
 
             #keep the elite individual
             population.sort(key = lambda x: x.fitness)
