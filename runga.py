@@ -68,8 +68,61 @@ def run_ga(
     )
 
     #TODO: test performance
-    def test_performance():
-        return 0
+    def test_performance(individual):
+        assemble_ok = True
+        cubin = None
+        try:
+            sass = sasskernel._update_kernel(individual.sass)
+            cubin = write_sass_file(sass)
+            bin.asm['cubin'] = cubin
+        except Exception as e:
+            print(f'Assemble failed: {e}')
+            assemble_ok = False
+            cubin = None
+
+            
+        # BENCH
+        fn = lambda: bin.c_wrapper(
+            grid_0,
+            grid_1,
+            grid_2,
+            bin.num_warps,
+            bin.num_ctas,
+            bin.clusterDims[0],
+            bin.clusterDims[1],
+            bin.clusterDims[2],
+            bin.shared,
+            stream,
+            bin.cu_function,
+            launch_enter_hook,
+            launch_exit_hook,
+            bin,
+            *bin.assemble_tensormap_to_arg(non_constexpr_arg_values),
+        )
+        if assemble_ok:
+            try:
+                ms = triton.testing.do_bench(fn, warmup=100, rep=100)
+                # ms = do_bench(fn, 100, 100)
+            except RuntimeError as run_err:
+                # likely a cuda error
+                logger.error(f'CUDA? Runtime Err: {run_err}')
+                ms = -1
+                cubin = None
+            except Exception as e:
+                logger.error(f'Other error: {e}')
+                raise e
+        else:
+            ms = -1
+
+        if config.total_flops is not None:
+            tflops = config.total_flops / ms * 1e-9
+            # print(f'ms: {ms:.3f}; tflops: {tflops:.3f};')
+            return tflops, cubin
+
+        # print(f'ms: {ms:.3f};')
+        raise NotImplementedError()
+
+
 
     sass, kernel_section = extract_kernel_sass_from_bin(bin)
     sasskernel = SassKernel(sass, kernel_section)
@@ -82,6 +135,7 @@ def run_ga(
     sass = sasskernel._update_kernel(best.sass)
     cubin = write_sass_file(sass)
     asm['cubin'] = cubin
+    bin.asm['cubin'] = cubin
     
 
 

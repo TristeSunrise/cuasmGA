@@ -1,6 +1,7 @@
 import sys
 from collections import defaultdict, namedtuple
 
+from runga import run_ga
 from triton.runtime.jit import T, JITFunction, KernelArg, get_current_device, set_current_device, get_cuda_stream
 from triton.compiler.compiler import CompiledKernel, compile, get_arch_default_num_stages, get_arch_default_num_warps
 from triton.common.backend import get_backend, get_cuda_version_key
@@ -236,7 +237,7 @@ class ASMJITFunction(JITFunction):
                 CompiledKernel.launch_enter_hook,
                 CompiledKernel.launch_exit_hook,  #
                 # others
-                self.drl_config,  # <- init by the autotuner
+                self.ga_config,  # <- init by the autotuner
             )
             # print(f"bin after run_drl: {bin}")
             sys.exit(0)  # signal that training is ok
