@@ -202,14 +202,17 @@ class GeneticAlgorithm:
 
     def evaluate_fitness(self, individual: Individual) -> float:
         # 可选：先做 correctness gate（强烈建议）
-        updated_sass = self.sasskernel._update_kernel(individual.sass)
-        if not self.test_correctness(write_sass_file(updated_sass)):
-            # 不通过的个体直接给个极差分（或丢弃）
+        try:
+            updated_sass = self.sasskernel._update_kernel(individual.sass)
+            ok = self.test_correctness(write_sass_file(updated_sass))
+            if not ok:
+                individual.fitness = float("inf")
+            else:
+                f = self.test_performance(individual)
+                individual.fitness = float(f) if f is not None else float("inf")
+        except Exception:
             individual.fitness = float("inf")
-            return individual.fitness
-        fitness = self.test_performance(individual)
-        individual.fitness = fitness
-        return fitness
+        return individual.fitness
 
     # ---- 初始化：用 “随机键 + 列表调度” 采样拓扑序（而不是 random.shuffle）----
     def initialize_population(self, original_kernel_section: List[str]):

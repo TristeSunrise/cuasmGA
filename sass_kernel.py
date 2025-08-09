@@ -20,7 +20,7 @@ class SassKernel:
         for i, line in enumerate(self.kernel_section):
             if line.strip().startswith(".text."):
                 self.kernel_label = line
-                self.kernel_start_line = i
+                self.kernel_start_line = i+1
                 print(f"kernrl start line found: {self.kernel_start_line}")
                 break
             # else:print("kernrl start line not found")
@@ -28,7 +28,7 @@ class SassKernel:
 
         for i, line in enumerate(self.sass):
             if line == self.kernel_label:
-                self.startline = i
+                self.startline = i+1
                 print(f"startline found: {self.startline}")
                 break
             # else:print("startline not found")
@@ -36,8 +36,10 @@ class SassKernel:
     
         endline = self.startline
         k_line = self.kernel_start_line
+        # print(f"endline:{endline}")
+        # print(f"k_line:{k_line}")
         while endline < len(self.sass) and k_line < len(self.kernel_section):
-            if self.sass[endline] != self.kernel_section[k_line]:
+            if self.sass[endline] != self.kernel_section[k_line] or not self.kernel_section[k_line].strip():
                 self.endline = endline
                 print(f"endline found:{self.endline}")
                 break
