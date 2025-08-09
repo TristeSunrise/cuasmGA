@@ -245,6 +245,10 @@ class GeneticAlgorithm:
 
     # ---- 你的 run_ga 逻辑基本不变，仅初始化已换成合法拓扑采样 ----
     def run_ga(self, originol_pure_kernel: List[str]):
+        origin = Individual(originol_pure_kernel)
+        print("testing the correctness of the original kernel")
+        origin.fitness = self.evaluate_fitness(origin)
+        print(f"original kernel fitness: {origin.fitness}")
         population = self.initialize_population(originol_pure_kernel)
 
         for gen in range(NUM_GENERATIONS):
