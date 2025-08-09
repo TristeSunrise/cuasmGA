@@ -133,16 +133,17 @@ def run_ga(
 
 
     pure_kernel_section = sasskernel._get_kernel()
+    pure_kernel_section = [ln for ln in pure_kernel_section if ln.strip()]
     # ga = GeneticAlgorithm(pure_kernel_section,test_correctness, test_performance)
     baseline_sass, preds = build_from_lines(pure_kernel_section, keep_comments=False)
 
     ga = GeneticAlgorithm(
-    kernel_section = baseline_sass,          # 用清洗后的 baseline 作为全集
+    kernel_section = pure_kernel_section,          # 用清洗后的 baseline 作为全集
     test_correctness = test_correctness,
     test_performance = test_performance,
     preds = preds
 )
-    best = ga.run_ga(baseline_sass)
+    best = ga.run_ga(pure_kernel_section)
 
     sass = sasskernel._update_kernel(best.sass)
     cubin = write_sass_file(sass)
