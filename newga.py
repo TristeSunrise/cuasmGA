@@ -260,63 +260,61 @@ class GeneticAlgorithm:
     def crossover(self, parent1: Individual, parent2: Individual):
         p1 = self._to_ids(parent1.sass)
         p2 = self._to_ids(parent2.sass)
-
         try:
             child_ids_1 = _ppx_ids(p1, p2, self.preds)
             child_ids_2 = _ppx_ids(p2, p1, self.preds)
         except Exception:
-            # 如果 PPX 出异常，直接回退为父代（稳）
-            return Individual(parent1.sass[:]), Individual(parent2.sass[:])
+            c1 = Individual(parent1.sass[:]); c1.fitness = parent1.fitness if parent1.fitness is not None else float("inf")
+            c2 = Individual(parent2.sass[:]); c2.fitness = parent2.fitness if parent2.fitness is not None else float("inf")
+            return c1, c2
 
-        # 同一性剪枝：避免无意义评估
         if child_ids_1 == p1:
-            c1 = Individual(parent1.sass[:])
-            c1.fitness = parent1.fitness
+            c1 = Individual(parent1.sass[:]); c1.fitness = parent1.fitness
         else:
-            c1 = Individual(self._to_lines(child_ids_1))
-            c1.fitness = self.evaluate_fitness(c1)
+            c1 = Individual(self._to_lines(child_ids_1)); c1.fitness = self.evaluate_fitness(c1)
 
         if child_ids_2 == p2:
-            c2 = Individual(parent2.sass[:])
-            c2.fitness = parent2.fitness
+            c2 = Individual(parent2.sass[:]); c2.fitness = parent2.fitness
         else:
-            c2 = Individual(self._to_lines(child_ids_2))
-            c2.fitness = self.evaluate_fitness(c2)
+            c2 = Individual(self._to_lines(child_ids_2)); c2.fitness = self.evaluate_fitness(c2)
 
         return c1, c2
-
 
     # ---- 变异：对当前顺序做“键扰动→重调度”，始终合法 ----
     def mutate(self, individual: Individual) -> Individual:
         if random.random() >= MUTATION_RATE:
+            if individual.fitness is None:            # 补评估
+                individual.fitness = self.evaluate_fitness(individual)
             return individual
 
         ids = self._to_ids(individual.sass)
         N = len(ids)
-
-        # 用当前位置当键，只对 ALU 节点注入很小抖动
-        keys = [0.0] * N
-        for pos, v in enumerate(ids):
-            keys[v] = float(pos)
-        # 选择少量可动节点
+        keys = [0.0]*N
+        for pos, v in enumerate(ids): keys[v] = float(pos)
         movable = [i for i in range(N) if self.movable_mask[i]]
         if not movable:
+            if individual.fitness is None:
+                individual.fitness = self.evaluate_fitness(individual)
             return individual
-        k = max(1, len(movable) // 50)  # 约 2%
+        k = max(1, len(movable)//50)
         for v in random.sample(movable, k):
-            keys[v] += random.uniform(-0.05, 0.05) * N  # 比初始化更小
-
+            keys[v] += random.uniform(-0.05, 0.05) * N
         try:
             new_ids = _list_schedule_by_keys(keys, self.preds)
         except Exception:
-            return individual  # 保守回退
+            if individual.fitness is None:
+                individual.fitness = self.evaluate_fitness(individual)
+            return individual
 
         if new_ids == ids:
-            return individual  # 没变化就不评估
+            if individual.fitness is None:
+                individual.fitness = self.evaluate_fitness(individual)
+            return individual
 
         individual.sass = self._to_lines(new_ids)
         individual.fitness = self.evaluate_fitness(individual)
         return individual
+
 
     # ---- 你的 run_ga 逻辑基本不变，仅初始化已换成合法拓扑采样 ----
     def run_ga(self, originol_pure_kernel: List[str]):
