@@ -170,11 +170,13 @@ class GeneticAlgorithm:
     original_kernel_section: Optional[list] = None
 
     def __init__(self, kernel_section: List[str],
+                 sasskernel: SassKernel,
                  test_correctness,
                  test_performance: Callable[[Individual], float],
                  preds: Dict[int, Set[int]]):
         # 基线 & DAG
         self.original_kernel_section = kernel_section
+        self.sasskernel = sasskernel
         self.baseline = kernel_section[:]            # 用作全集/映射基准
         self.preds = preds
         self.catalog = _make_catalog(self.baseline)
@@ -196,7 +198,8 @@ class GeneticAlgorithm:
 
     def evaluate_fitness(self, individual: Individual) -> float:
         # 可选：先做 correctness gate（强烈建议）
-        if not self.test_correctness(write_sass_file(individual.sass)):
+        updated_sass = self.sasskernel._update_kernel(individual.sass)
+        if not self.test_correctness(write_sass_file(updated_sass)):
             # 不通过的个体直接给个极差分（或丢弃）
             individual.fitness = float("inf")
             return individual.fitness

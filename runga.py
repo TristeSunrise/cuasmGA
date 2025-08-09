@@ -139,6 +139,7 @@ def run_ga(
 
     ga = GeneticAlgorithm(
     kernel_section = pure_kernel_section,          # 用清洗后的 baseline 作为全集
+    sasskernel=sasskernel,
     test_correctness = test_correctness,
     test_performance = test_performance,
     preds = preds
