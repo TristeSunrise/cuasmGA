@@ -67,7 +67,7 @@ def write_sass_file(updated_sass):
         cubin = cap.dump_cubin()
         self.update_cubin(cubin)
     except Exception as e:
-        print(f'Assemble failed: {e}')
+        print(f'Assemble failed in write_sass_file: {e}')
         assemble_ok = False
     
     return cubin

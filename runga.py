@@ -12,6 +12,7 @@ import torch
 # asm (add CuAsm to PYTHONPATH!)
 from CuAsm.CubinFile import CubinFile
 
+from maskgen import build_movable_mask
 from newga import GeneticAlgorithm
 
 # mutation
@@ -82,7 +83,7 @@ def run_ga(
             cubin = write_sass_file(sass)
             bin.asm['cubin'] = cubin
         except Exception as e:
-            print(f'Assemble failed: {e}')
+            print(f'Assemble failed in test_performance: {e}')
             assemble_ok = False
             cubin = None
 
@@ -135,11 +136,12 @@ def run_ga(
     pure_kernel_section = sasskernel._get_kernel()
     pure_kernel_section = [ln for ln in pure_kernel_section if ln.strip()]
     # ga = GeneticAlgorithm(pure_kernel_section,test_correctness, test_performance)
-    baseline_sass, preds = build_from_lines(pure_kernel_section, keep_comments=False)
-
+    baseline_sass, preds = build_from_lines(pure_kernel_section)
+    movable_mask = build_movable_mask(pure_kernel_section)
     ga = GeneticAlgorithm(
     kernel_section = pure_kernel_section,          # 用清洗后的 baseline 作为全集
     sasskernel=sasskernel,
+    movable_mask = movable_mask,
     test_correctness = test_correctness,
     test_performance = test_performance,
     preds = preds

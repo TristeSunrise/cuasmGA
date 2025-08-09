@@ -165,12 +165,14 @@ class Individual:
     def __init__(self, kernel_section: List[str]):
         self.sass = kernel_section
         self.fitness: Optional[float] = None
+        
 
 class GeneticAlgorithm:
     original_kernel_section: Optional[list] = None
 
     def __init__(self, kernel_section: List[str],
                  sasskernel: SassKernel,
+                 movable_mask,
                  test_correctness,
                  test_performance: Callable[[Individual], float],
                  preds: Dict[int, Set[int]]):
@@ -180,6 +182,8 @@ class GeneticAlgorithm:
         self.baseline = kernel_section[:]            # 用作全集/映射基准
         self.preds = preds
         self.catalog = _make_catalog(self.baseline)
+        self.movable_mask = movable_mask or [True] * len(self.baseline)  # 无则全开
+        assert len(self.movable_mask) == len(self.baseline)
 
         self.counter = Counter(kernel_section)
         print(f"Existing duplicate？：{any(c>1 for c in self.counter.values())}")
@@ -211,36 +215,104 @@ class GeneticAlgorithm:
     def initialize_population(self, original_kernel_section: List[str]):
         population = []
         N = len(original_kernel_section)
-        for _ in range(POP_SIZE):
-            keys = [random.random() for _ in range(N)]
-            ids = _list_schedule_by_keys(keys, self.preds)
-            sass = self._to_lines(ids)
-            assert Counter(sass) == self.counter
-            ind = Individual(sass)
-            ind.fitness = self.evaluate_fitness(ind)
-            population.append(ind)
+
+        # (a) 基线个体（保证至少有一个可运行）
+        base_ids = list(range(N))
+        base_sass = self._to_lines(base_ids)
+        base_ind = Individual(base_sass)
+        base_ind.fitness = self.evaluate_fitness(base_ind)
+        population.append(base_ind)
+
+        # (b) 其余：keys=基线位置 + 小噪声（只对 ALU 节点加噪）
+        tries = 0
+        while len(population) < POP_SIZE and tries < POP_SIZE * 20:
+            tries += 1
+            keys = [float(i) for i in range(N)]
+            for i in range(N):
+                if self.movable_mask[i]:
+                    # 轻微扰动，别太大（严格 preds 下 0.1~0.3 足够）
+                    keys[i] += random.uniform(-0.2, 0.2)
+            try:
+                ids = _list_schedule_by_keys(keys, self.preds)
+                sass = self._to_lines(ids)
+                if Counter(sass) != self.counter:
+                    continue
+                ind = Individual(sass)
+                ind.fitness = self.evaluate_fitness(ind)
+                if ind.fitness != float("inf"):
+                    population.append(ind)
+            except Exception:
+                # 生成/评估失败就重试
+                continue
+
+        # 若仍不足，补基线拷贝，保证稳定启动
+        while len(population) < POP_SIZE:
+            dup = Individual(base_sass[:])
+            dup.fitness = base_ind.fitness
+            population.append(dup)
+
         return population
 
     # ---- 交叉：PPX，保证子代仍是 DAG 的拓扑序 ----
     def crossover(self, parent1: Individual, parent2: Individual):
         p1 = self._to_ids(parent1.sass)
         p2 = self._to_ids(parent2.sass)
-        child_ids_1 = _ppx_ids(p1, p2, self.preds)
-        child_ids_2 = _ppx_ids(p2, p1, self.preds)
-        c1 = Individual(self._to_lines(child_ids_1))
-        c2 = Individual(self._to_lines(child_ids_2))
-        # 评估（含 correctness gate）
-        c1.fitness = self.evaluate_fitness(c1)
-        c2.fitness = self.evaluate_fitness(c2)
+
+        try:
+            child_ids_1 = _ppx_ids(p1, p2, self.preds)
+            child_ids_2 = _ppx_ids(p2, p1, self.preds)
+        except Exception:
+            # 如果 PPX 出异常，直接回退为父代（稳）
+            return Individual(parent1.sass[:]), Individual(parent2.sass[:])
+
+        # 同一性剪枝：避免无意义评估
+        if child_ids_1 == p1:
+            c1 = Individual(parent1.sass[:])
+            c1.fitness = parent1.fitness
+        else:
+            c1 = Individual(self._to_lines(child_ids_1))
+            c1.fitness = self.evaluate_fitness(c1)
+
+        if child_ids_2 == p2:
+            c2 = Individual(parent2.sass[:])
+            c2.fitness = parent2.fitness
+        else:
+            c2 = Individual(self._to_lines(child_ids_2))
+            c2.fitness = self.evaluate_fitness(c2)
+
         return c1, c2
+
 
     # ---- 变异：对当前顺序做“键扰动→重调度”，始终合法 ----
     def mutate(self, individual: Individual) -> Individual:
-        if random.random() < MUTATION_RATE:
-            ids = self._to_ids(individual.sass)
-            new_ids = _mutate_ids_by_key_jitter(ids, self.preds, strength=0.05)
-            individual.sass = self._to_lines(new_ids)
-            individual.fitness = self.evaluate_fitness(individual)
+        if random.random() >= MUTATION_RATE:
+            return individual
+
+        ids = self._to_ids(individual.sass)
+        N = len(ids)
+
+        # 用当前位置当键，只对 ALU 节点注入很小抖动
+        keys = [0.0] * N
+        for pos, v in enumerate(ids):
+            keys[v] = float(pos)
+        # 选择少量可动节点
+        movable = [i for i in range(N) if self.movable_mask[i]]
+        if not movable:
+            return individual
+        k = max(1, len(movable) // 50)  # 约 2%
+        for v in random.sample(movable, k):
+            keys[v] += random.uniform(-0.05, 0.05) * N  # 比初始化更小
+
+        try:
+            new_ids = _list_schedule_by_keys(keys, self.preds)
+        except Exception:
+            return individual  # 保守回退
+
+        if new_ids == ids:
+            return individual  # 没变化就不评估
+
+        individual.sass = self._to_lines(new_ids)
+        individual.fitness = self.evaluate_fitness(individual)
         return individual
 
     # ---- 你的 run_ga 逻辑基本不变，仅初始化已换成合法拓扑采样 ----
