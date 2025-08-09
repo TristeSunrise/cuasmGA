@@ -158,6 +158,13 @@ def _mutate_ids_by_key_jitter(ids: List[int], preds: Dict[int, Set[int]], streng
         base_keys[v] += rng.uniform(-strength, strength) * N
     # 重新解码为合法拓扑序
     return _list_schedule_by_keys(base_keys, preds)
+def _assert_perm(ids: list[int], N: int):
+    if len(ids) != N or set(ids) != set(range(N)):
+        raise AssertionError("ids 不是 [0..N-1] 的排列")
+
+def _check_multiset(lines: list[str], baseline_counter: Counter):
+    assert Counter(lines) == baseline_counter, "指令多重集不一致"
+
 
 # ======== 下面是你原 GA 的“最小改造版本” ========
 
@@ -255,30 +262,75 @@ class GeneticAlgorithm:
             population.append(dup)
 
         return population
-
+    
     # ---- 交叉：PPX，保证子代仍是 DAG 的拓扑序 ----
     def crossover(self, parent1: Individual, parent2: Individual):
+        """
+        rank-mix crossover：
+        - 用两个父代的名次 rank1/rank2 混合得到 key
+        - 仅对 movable 节点加小噪声
+        - 用列表调度按 DAG 解码得到合法子代
+        - 若子代与父代完全一样，做一次很小的 jitter 保证差异
+        """
+        # --- 把父代转成 ID 序列 ---
         p1 = self._to_ids(parent1.sass)
         p2 = self._to_ids(parent2.sass)
+        N  = len(p1)
+        movable = getattr(self, "movable_mask", None) or [True] * N
+
+        def _rank(order: List[int]) -> List[int]:
+            r = [0] * N
+            for i, v in enumerate(order):
+                r[v] = i
+            return r
+
+        def _mix_child(alpha: float, noise: float) -> List[int]:
+            r1, r2 = _rank(p1), _rank(p2)
+            keys = [0.0] * N
+            for v in range(N):
+                base = alpha * r1[v] + (1.0 - alpha) * r2[v]
+                if movable[v]:
+                    base += random.uniform(-noise, noise) * N  # 仅对可移动节点加噪
+                keys[v] = base
+            return _list_schedule_by_keys(keys, self.preds)
+
         try:
-            child_ids_1 = _ppx_ids(p1, p2, self.preds)
-            child_ids_2 = _ppx_ids(p2, p1, self.preds)
+            # 生成两种风味的子代（父代权重不同）
+            child_ids_1 = _mix_child(alpha=0.35, noise=0.12)
+            child_ids_2 = _mix_child(alpha=0.65, noise=0.12)
         except Exception:
-            c1 = Individual(parent1.sass[:]); c1.fitness = parent1.fitness if parent1.fitness is not None else float("inf")
-            c2 = Individual(parent2.sass[:]); c2.fitness = parent2.fitness if parent2.fitness is not None else float("inf")
+            # 兜底：回退为父代拷贝，且确保有 fitness
+            c1 = Individual(parent1.sass[:])
+            c2 = Individual(parent2.sass[:])
+            c1.fitness = parent1.fitness if parent1.fitness is not None else self.evaluate_fitness(c1)
+            c2.fitness = parent2.fitness if parent2.fitness is not None else self.evaluate_fitness(c2)
             return c1, c2
 
+        # 若子代与对应父代完全一致，做一次很小的 jitter，保证“有变化但合法”
         if child_ids_1 == p1:
-            c1 = Individual(parent1.sass[:]); c1.fitness = parent1.fitness
-        else:
-            c1 = Individual(self._to_lines(child_ids_1)); c1.fitness = self.evaluate_fitness(c1)
-
+            try:
+                child_ids_1 = _mutate_ids_by_key_jitter(child_ids_1, self.preds, strength=0.03)
+            except Exception:
+                pass
         if child_ids_2 == p2:
-            c2 = Individual(parent2.sass[:]); c2.fitness = parent2.fitness
-        else:
-            c2 = Individual(self._to_lines(child_ids_2)); c2.fitness = self.evaluate_fitness(c2)
+            try:
+                child_ids_2 = _mutate_ids_by_key_jitter(child_ids_2, self.preds, strength=0.03)
+            except Exception:
+                pass
 
+        # --- 映射回文本，并做多重集一致性校验（防止意外） ---
+        c1_lines = self._to_lines(child_ids_1)
+        if Counter(c1_lines) != self.counter:
+            c1_lines = parent1.sass[:]  # 兜底回退
+        c2_lines = self._to_lines(child_ids_2)
+        if Counter(c2_lines) != self.counter:
+            c2_lines = parent2.sass[:]
+
+        # --- 构造个体并评估 ---
+        c1 = Individual(c1_lines); c1.fitness = self.evaluate_fitness(c1)
+        c2 = Individual(c2_lines); c2.fitness = self.evaluate_fitness(c2)
         return c1, c2
+
 
     # ---- 变异：对当前顺序做“键扰动→重调度”，始终合法 ----
     def mutate(self, individual: Individual) -> Individual:
@@ -309,6 +361,9 @@ class GeneticAlgorithm:
         if new_ids == ids:
             if individual.fitness is None:
                 individual.fitness = self.evaluate_fitness(individual)
+            _assert_perm(new_ids, len(self.baseline))
+            new_lines = self._to_lines(new_ids)
+            _check_multiset(new_lines, self.counter)
             return individual
 
         individual.sass = self._to_lines(new_ids)
