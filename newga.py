@@ -31,6 +31,7 @@ def _to_ids(seq: List[str], baseline: List[str], catalog=None) -> List[int]:
             raise ValueError(f"发现与基线不一致的指令文本：{s!r}")
         ids.append(catalog[s][k])
         counters[s] += 1
+    print(f"ids: {len(ids)}")
     return ids
 
 def _to_lines(ids: List[int], baseline: List[str]) -> List[str]:

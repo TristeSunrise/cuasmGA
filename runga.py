@@ -142,7 +142,7 @@ def run_ga(
     test_performance = test_performance,
     preds = preds
 )
-    best = ga.run_ga(pure_kernel_section)
+    best = ga.run_ga(baseline_sass)
 
     sass = sasskernel._update_kernel(best.sass)
     cubin = write_sass_file(sass)
