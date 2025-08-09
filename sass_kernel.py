@@ -51,7 +51,7 @@ class SassKernel:
         # print("run _locate_kernel")
 
     def _get_kernel(self):
-        return self.sass[self.startline:self.endline]
+        return self.sass[self.startline+1:self.endline]
     
     def _update_kernel(self, kernel_lines):
         updated_sass = deepcopy(self.sass)

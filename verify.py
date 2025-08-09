@@ -142,10 +142,13 @@ def test_via_cubin(
     stream,  #
     enter_hook,
     exit_hook,
+    
+    
     cubin,
-    n_test_samples,
+    n_test_samples = 2,
     test_batch_size=1,
     verbose=True,
+    
 ):
     if static_test_samples is not None:
         okss = []
