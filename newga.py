@@ -10,7 +10,7 @@ from sassgen import write_sass_file
 
 
 POP_SIZE = 10   #population size
-MUTATION_RATE = 0.1
+MUTATION_RATE = 1
 NUM_GENERATIONS = 10
 ELITE_SIZE = 4
 # --- 把文本序列 <-> 基线ID序列 的映射（处理重复指令文本） ---
@@ -165,6 +165,45 @@ def _assert_perm(ids: list[int], N: int):
 def _check_multiset(lines: list[str], baseline_counter: Counter):
     assert Counter(lines) == baseline_counter, "指令多重集不一致"
 
+def _build_succs(preds):
+    from collections import defaultdict
+    succs = defaultdict(list)
+    for v, ps in preds.items():
+        for u in ps:
+            succs[u].append(v)
+    return succs
+
+def _topo_order(preds):
+    from collections import deque
+    N = len(preds)
+    indeg = [0]*N
+    succs = _build_succs(preds)
+    for v, ps in preds.items():
+        indeg[v] = len(ps)
+    q = deque([i for i in range(N) if indeg[i]==0])
+    order = []
+    while q:
+        v = q.popleft()
+        order.append(v)
+        for w in succs[v]:
+            indeg[w] -= 1
+            if indeg[w]==0:
+                q.append(w)
+    if len(order)!=N:
+        raise RuntimeError("Not a DAG")
+    return order
+
+def _precompute_ancestors(preds):
+    """anc[v] = 所有必须在 v 之前的节点（传递闭包）"""
+    N = len(preds)
+    order = _topo_order(preds)
+    anc = [set() for _ in range(N)]
+    for v in order:
+        S = set()
+        for u in preds[v]:
+            S.add(u); S |= anc[u]
+        anc[v] = S
+    return anc
 
 # ======== 下面是你原 GA 的“最小改造版本” ========
 
@@ -191,6 +230,7 @@ class GeneticAlgorithm:
         self.catalog = _make_catalog(self.baseline)
         self.movable_mask = movable_mask or [True] * len(self.baseline)  # 无则全开
         assert len(self.movable_mask) == len(self.baseline)
+        self.anc = _precompute_ancestors(self.preds)
 
         self.counter = Counter(kernel_section)
         print(f"Existing duplicate？：{any(c>1 for c in self.counter.values())}")
@@ -264,111 +304,132 @@ class GeneticAlgorithm:
         return population
     
     # ---- 交叉：PPX，保证子代仍是 DAG 的拓扑序 ----
+    # def crossover(self, parent1: Individual, parent2: Individual):
+    #     """
+    #     rank-mix crossover：
+    #     - 用两个父代的名次 rank1/rank2 混合得到 key
+    #     - 仅对 movable 节点加小噪声
+    #     - 用列表调度按 DAG 解码得到合法子代
+    #     - 若子代与父代完全一样，做一次很小的 jitter 保证差异
+    #     """
+    #     # --- 把父代转成 ID 序列 ---
+    #     p1 = self._to_ids(parent1.sass)
+    #     p2 = self._to_ids(parent2.sass)
+    #     N  = len(p1)
+    #     movable = getattr(self, "movable_mask", None) or [True] * N
+
+    #     def _rank(order: List[int]) -> List[int]:
+    #         r = [0] * N
+    #         for i, v in enumerate(order):
+    #             r[v] = i
+    #         return r
+
+    #     def _mix_child(alpha: float, noise: float) -> List[int]:
+    #         r1, r2 = _rank(p1), _rank(p2)
+    #         keys = [0.0] * N
+    #         for v in range(N):
+    #             base = alpha * r1[v] + (1.0 - alpha) * r2[v]
+    #             if movable[v]:
+    #                 base += random.uniform(-noise, noise) * N  # 仅对可移动节点加噪
+    #             keys[v] = base
+    #         return _list_schedule_by_keys(keys, self.preds)
+
+    #     try:
+    #         # 生成两种风味的子代（父代权重不同）
+    #         child_ids_1 = _mix_child(alpha=0.35, noise=0.12)
+    #         child_ids_2 = _mix_child(alpha=0.65, noise=0.12)
+    #     except Exception:
+    #         # 兜底：回退为父代拷贝，且确保有 fitness
+    #         c1 = Individual(parent1.sass[:])
+    #         c2 = Individual(parent2.sass[:])
+    #         c1.fitness = parent1.fitness if parent1.fitness is not None else self.evaluate_fitness(c1)
+    #         c2.fitness = parent2.fitness if parent2.fitness is not None else self.evaluate_fitness(c2)
+    #         return c1, c2
+
+    #     # 若子代与对应父代完全一致，做一次很小的 jitter，保证“有变化但合法”
+    #     if child_ids_1 == p1:
+    #         try:
+    #             child_ids_1 = _mutate_ids_by_key_jitter(child_ids_1, self.preds, strength=0.03)
+    #         except Exception:
+    #             pass
+    #     if child_ids_2 == p2:
+    #         try:
+    #             child_ids_2 = _mutate_ids_by_key_jitter(child_ids_2, self.preds, strength=0.03)
+    #         except Exception:
+    #             pass
+
+    #     # --- 映射回文本，并做多重集一致性校验（防止意外） ---
+    #     c1_lines = self._to_lines(child_ids_1)
+    #     if Counter(c1_lines) != self.counter:
+    #         c1_lines = parent1.sass[:]  # 兜底回退
+    #     c2_lines = self._to_lines(child_ids_2)
+    #     if Counter(c2_lines) != self.counter:
+    #         c2_lines = parent2.sass[:]
+
+    #     # --- 构造个体并评估 ---
+    #     c1 = Individual(c1_lines); c1.fitness = self.evaluate_fitness(c1)
+    #     c2 = Individual(c2_lines); c2.fitness = self.evaluate_fitness(c2)
+    #     return c1, c2
     def crossover(self, parent1: Individual, parent2: Individual):
-        """
-        rank-mix crossover：
-        - 用两个父代的名次 rank1/rank2 混合得到 key
-        - 仅对 movable 节点加小噪声
-        - 用列表调度按 DAG 解码得到合法子代
-        - 若子代与父代完全一样，做一次很小的 jitter 保证差异
-        """
-        # --- 把父代转成 ID 序列 ---
-        p1 = self._to_ids(parent1.sass)
-        p2 = self._to_ids(parent2.sass)
-        N  = len(p1)
-        movable = getattr(self, "movable_mask", None) or [True] * N
-
-        def _rank(order: List[int]) -> List[int]:
-            r = [0] * N
-            for i, v in enumerate(order):
-                r[v] = i
-            return r
-
-        def _mix_child(alpha: float, noise: float) -> List[int]:
-            r1, r2 = _rank(p1), _rank(p2)
-            keys = [0.0] * N
-            for v in range(N):
-                base = alpha * r1[v] + (1.0 - alpha) * r2[v]
-                if movable[v]:
-                    base += random.uniform(-noise, noise) * N  # 仅对可移动节点加噪
-                keys[v] = base
-            return _list_schedule_by_keys(keys, self.preds)
-
-        try:
-            # 生成两种风味的子代（父代权重不同）
-            child_ids_1 = _mix_child(alpha=0.35, noise=0.12)
-            child_ids_2 = _mix_child(alpha=0.65, noise=0.12)
-        except Exception:
-            # 兜底：回退为父代拷贝，且确保有 fitness
-            c1 = Individual(parent1.sass[:])
-            c2 = Individual(parent2.sass[:])
-            c1.fitness = parent1.fitness if parent1.fitness is not None else self.evaluate_fitness(c1)
-            c2.fitness = parent2.fitness if parent2.fitness is not None else self.evaluate_fitness(c2)
-            return c1, c2
-
-        # 若子代与对应父代完全一致，做一次很小的 jitter，保证“有变化但合法”
-        if child_ids_1 == p1:
-            try:
-                child_ids_1 = _mutate_ids_by_key_jitter(child_ids_1, self.preds, strength=0.03)
-            except Exception:
-                pass
-        if child_ids_2 == p2:
-            try:
-                child_ids_2 = _mutate_ids_by_key_jitter(child_ids_2, self.preds, strength=0.03)
-            except Exception:
-                pass
-
-        # --- 映射回文本，并做多重集一致性校验（防止意外） ---
-        c1_lines = self._to_lines(child_ids_1)
-        if Counter(c1_lines) != self.counter:
-            c1_lines = parent1.sass[:]  # 兜底回退
-        c2_lines = self._to_lines(child_ids_2)
-        if Counter(c2_lines) != self.counter:
-            c2_lines = parent2.sass[:]
-
-        # --- 构造个体并评估 ---
-        c1 = Individual(c1_lines); c1.fitness = self.evaluate_fitness(c1)
-        c2 = Individual(c2_lines); c2.fitness = self.evaluate_fitness(c2)
+        c1 = Individual(parent1.sass[:]); c1.fitness = parent1.fitness if parent1.fitness is not None else self.evaluate_fitness(c1)
+        c2 = Individual(parent2.sass[:]); c2.fitness = parent2.fitness if parent2.fitness is not None else self.evaluate_fitness(c2)
         return c1, c2
 
 
     # ---- 变异：对当前顺序做“键扰动→重调度”，始终合法 ----
-    def mutate(self, individual: Individual) -> Individual:
+    def mutate(self, individual: Individual, max_steps: int = 2) -> Individual:
+        # 纯变异版本：最小幅度移动计算指令（不破坏依赖）
         if random.random() >= MUTATION_RATE:
-            if individual.fitness is None:            # 补评估
+            if individual.fitness is None:
                 individual.fitness = self.evaluate_fitness(individual)
             return individual
 
         ids = self._to_ids(individual.sass)
         N = len(ids)
-        keys = [0.0]*N
-        for pos, v in enumerate(ids): keys[v] = float(pos)
+        pos = {v:i for i,v in enumerate(ids)}
+
+        # 候选：可移动掩码（建议是 ALU 且无谓词/无 CC/无内存副作用）
         movable = [i for i in range(N) if self.movable_mask[i]]
         if not movable:
             if individual.fitness is None:
                 individual.fitness = self.evaluate_fitness(individual)
             return individual
-        k = max(1, len(movable)//50)
-        for v in random.sample(movable, k):
-            keys[v] += random.uniform(-0.05, 0.05) * N
-        try:
-            new_ids = _list_schedule_by_keys(keys, self.preds)
-        except Exception:
+
+        v = random.choice(movable)
+        steps = random.randint(1, max_steps)
+        direction = random.choice([-1, +1])  # -1 向前，+1 向后
+
+        moved = False
+        for _ in range(steps):
+            i = pos[v]
+            j = i + direction
+            if not (0 <= j < N):
+                break
+            w = ids[j]
+            # 关键：判断跨过相邻 w 是否仍拓扑合法
+            # 向前移动 v（把 v 放到 w 前） => 不能让 v 早于它的任一祖先，尤其是 w 若是祖先就不行
+            if direction < 0:
+                if w in self.anc[v]:
+                    break
+            else:
+                # 向后移动 v（把 v 放到 w 后） => 不能让 v 晚于它的任一后继；等价检查 v 是否是 w 的祖先
+                if v in self.anc[w]:
+                    break
+            # 交换相邻（安全）
+            ids[i], ids[j] = ids[j], ids[i]
+            pos[v], pos[w] = j, i
+            moved = True
+
+        if not moved:
             if individual.fitness is None:
                 individual.fitness = self.evaluate_fitness(individual)
             return individual
 
-        if new_ids == ids:
-            if individual.fitness is None:
-                individual.fitness = self.evaluate_fitness(individual)
-            _assert_perm(new_ids, len(self.baseline))
-            new_lines = self._to_lines(new_ids)
-            _check_multiset(new_lines, self.counter)
-            return individual
-
-        individual.sass = self._to_lines(new_ids)
+        # 映射回文本并评估
+        individual.sass = self._to_lines(ids)
         individual.fitness = self.evaluate_fitness(individual)
         return individual
+
 
 
     # ---- 你的 run_ga 逻辑基本不变，仅初始化已换成合法拓扑采样 ----
