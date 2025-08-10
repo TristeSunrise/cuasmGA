@@ -12,14 +12,12 @@ import torch
 # asm (add CuAsm to PYTHONPATH!)
 from CuAsm.CubinFile import CubinFile
 
-from maskgen import build_movable_mask
 from newga import GeneticAlgorithm
 
 # mutation
 from logger import get_logger
 # from cuasmrl.utils.record import save_data, read_data
 from record import save_data
-from sass_dag_builder import build_from_lines
 from sass_kernel import SassKernel
 from sassgen import extract_kernel_sass_from_bin, write_sass_file
 from verify import test_via_cubin, gen_test_samples
@@ -136,15 +134,11 @@ def run_ga(
     pure_kernel_section = sasskernel._get_kernel()
     pure_kernel_section = [ln for ln in pure_kernel_section if ln.strip()]
     # ga = GeneticAlgorithm(pure_kernel_section,test_correctness, test_performance)
-    baseline_sass, preds = build_from_lines(pure_kernel_section)
-    movable_mask = build_movable_mask(pure_kernel_section)
     ga = GeneticAlgorithm(
     kernel_section = pure_kernel_section,          # 用清洗后的 baseline 作为全集
     sasskernel=sasskernel,
-    movable_mask = movable_mask,
     test_correctness = test_correctness,
     test_performance = test_performance,
-    preds = preds
 )
     best = ga.run_ga(pure_kernel_section)
 

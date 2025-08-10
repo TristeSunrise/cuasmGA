@@ -56,6 +56,8 @@ class SassKernel:
         return self.sass[self.startline+1:self.endline]
     
     def _update_kernel(self, kernel_lines):
+        if kernel_lines is None:
+            return self.sass[:]  # 返回原始副本
         updated_sass = deepcopy(self.sass)
         updated_sass[self.startline:self.endline] = kernel_lines
         return updated_sass
