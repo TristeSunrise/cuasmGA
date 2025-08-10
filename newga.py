@@ -119,7 +119,7 @@ class GeneticAlgorithm:
 
         self.mut_attempts += 1  
         sass = individual.sass[:]
-        changed = self.mover.step(sass, max_trials=20)
+        changed = self.mover.step(sass, max_trials=1)
         if not changed:
             # 没动成就不评估，保留原 fitness
             if individual.fitness is None:

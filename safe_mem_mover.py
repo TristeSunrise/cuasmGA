@@ -107,11 +107,7 @@ class SafeMemMover:
         """返回 [can_move_up, can_move_down]（严格复刻 Sample 的 _generate_mask）"""
         return self._gen_mask_for_line(sass, lineno)
 
-    def step(self, sass: List[str], *, max_trials: int = 20) -> bool:
-        """
-        尝试在 sass 上做一次随机“相邻安全交换”。
-        成功则原地修改并返回 True，否则 False。
-        """
+    def step(self, sass: List[str], *, max_trials: int = 1) -> bool:
         cands = self.candidates(sass, refresh=True)
         if not cands:
             return False
@@ -122,18 +118,12 @@ class SafeMemMover:
         while order and tried < max_trials:
             idx = order.pop()
             lineno = cands[idx]
-            up, down = self.mask(sass, lineno)
-            allowed = []
-            if up:
-                allowed.append(0)
-            if down:
-                allowed.append(1)
-            if not allowed:
+            up, _down = self.mask(sass, lineno)   # 只看上移
+            if not up:
                 tried += 1
                 continue
-            # 方向随机（与 RL 的 action 等价）
-            direction = self.rng.choice(allowed)
-            self._swap_adjacent_in_place(sass, lineno, direction)
+            # 上移：与上一行交换
+            self._swap_adjacent_in_place(sass, lineno, 0)
             return True
         return False
 
