@@ -153,7 +153,7 @@ class GeneticAlgorithm:
         population = self.initialize_population(original_kernel)
 
         for gen in range(NUM_GENERATIONS):
-            if gen%5 == 0:
+            if gen%5 == 0 and self.mut_attempts > 0:
                 print(f"success rate : {self.mut_valids/self.mut_attempts}")
                 print(f"move rate:{self.mut_moves/self.mut_attempts}")
             best = min(population, key=lambda x: x.fitness)
