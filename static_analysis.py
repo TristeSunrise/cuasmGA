@@ -1,12 +1,12 @@
 import os
 from logger import get_logger
+from decoder import decode, decode_ctrl_code
 
 logger = get_logger(__name__)
 
 
 def static_analysis(
     kernel_section,
-    decoder,
     ban_ops,
     memory_ops,
     min_st_analysis,  # out
@@ -37,7 +37,7 @@ def static_analysis(
         line = line.strip()
         # skip headers
         if len(line) > 0 and line[0] == '[':
-            ctrl_code, _, predicate, opcode, dst, src, _ = decoder.decode(line)
+            ctrl_code, _, predicate, opcode, dst, src, _ = decode(line)
             if ctrl_code is None:
                 # a label
                 continue
@@ -79,7 +79,6 @@ def static_analysis(
                 num_mem_inst += 1
                 resolved, tmp_opcode = find_def_use(
                     kernel_section,
-                    decoder,
                     min_st_analysis,
                     i,
                     line,
@@ -127,7 +126,6 @@ def static_analysis(
 
 def find_def_use(
     kernel_section,
-    decoder,
     min_st_analysis,  # out
     idx,
     line,
@@ -151,7 +149,7 @@ def find_def_use(
         accum = 0
         # print('line: ', line)
         while True:
-            tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src, _ = decoder.decode(
+            tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src, _ = decode(
                 kernel_section[idx - j].strip())
             if tmp_ctrl is None:
                 # if it is a label, don't care stall count
@@ -160,7 +158,7 @@ def find_def_use(
                 # FIXME should break? just skip?
                 break
 
-            *_, stall_count = decoder.decode_ctrl_code(tmp_ctrl)
+            *_, stall_count = decode_ctrl_code(tmp_ctrl)
             stall_count = int(stall_count[1:-1])
             accum += stall_count
 
@@ -175,7 +173,7 @@ def find_def_use(
                 else:
                     # logger.info(f'adding {line} with {accum}')
                     min_st_analysis[tmp_opcode] = accum
-                # logger.info(f'resolve {tmp_opcode}')
+                logger.info(f'resolve {tmp_opcode}')
                 resolved = True
                 resolved_opcode = tmp_opcode
                 break

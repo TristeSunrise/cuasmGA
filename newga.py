@@ -8,7 +8,7 @@ from sassgen import write_sass_file
 
 # 只负责“发现候选 + 掩码 + 相邻交换”的安全移动器
 from safe_mem_mover import SafeMemMover
-from decoder import Decoder
+
 
 # ========= 超参数 =========
 POP_SIZE        = 10
@@ -47,9 +47,8 @@ class GeneticAlgorithm:
 
         # 多重集守恒（理论上相邻交换必然守恒，这里只是留个断言工具）
         self.counter = Counter(kernel_section)
-        self.decoder = Decoder()
         # 安全移动器（无 engine 依赖，复用你 decoder.py 的两个函数）
-        self.mover = SafeMemMover(self.decoder)
+        self.mover = SafeMemMover()
 
     # ---------- 评估 ----------
     def evaluate_fitness(self, individual: Individual) -> float:
@@ -154,6 +153,9 @@ class GeneticAlgorithm:
         population = self.initialize_population(original_kernel)
 
         for gen in range(NUM_GENERATIONS):
+            if gen%5 == 0:
+                print(f"success rate : {self.mut_valids/self.mut_attempts}")
+                print(f"move rate:{self.mut_moves/self.mut_attempts}")
             best = min(population, key=lambda x: x.fitness)
             print(f"GEN {gen} best fitness: {best.fitness}")
 
