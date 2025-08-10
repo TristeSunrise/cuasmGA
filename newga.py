@@ -44,7 +44,7 @@ class GeneticAlgorithm:
 
         # 多重集守恒（理论上相邻交换必然守恒，这里只是留个断言工具）
         self.counter = Counter(kernel_section)
-
+        self.decoder = decoder.Decoder()
         # 安全移动器（无 engine 依赖，复用你 decoder.py 的两个函数）
         self.mover = SafeMemMover(decoder)
 
