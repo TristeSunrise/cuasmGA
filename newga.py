@@ -13,7 +13,7 @@ from decoder import Decoder
 # ========= 超参数 =========
 POP_SIZE        = 10
 MUTATION_RATE   = 1.0    # 只靠变异，建议 1.0
-NUM_GENERATIONS = 10
+NUM_GENERATIONS = 200
 ELITE_SIZE      = 4
 
 
@@ -41,6 +41,9 @@ class GeneticAlgorithm:
         self.sasskernel = sasskernel
         self.test_correctness = test_correctness
         self.test_performance = test_performance
+        self.mut_attempts = 0   # 变异尝试次数
+        self.mut_moves    = 0   # 做成一次合法交换的次数
+        self.mut_valids   = 0   # 变异后可运行（通过正确性门）的次数
 
         # 多重集守恒（理论上相邻交换必然守恒，这里只是留个断言工具）
         self.counter = Counter(kernel_section)
@@ -115,6 +118,7 @@ class GeneticAlgorithm:
                 individual.fitness = self.evaluate_fitness(individual)
             return individual
 
+        self.mut_attempts += 1  
         sass = individual.sass[:]
         changed = self.mover.step(sass, max_trials=20)
         if not changed:
@@ -122,11 +126,13 @@ class GeneticAlgorithm:
             if individual.fitness is None:
                 individual.fitness = self.evaluate_fitness(individual)
             return individual
-
+        self.mut_moves += 1
         # 多重集守恒保险（可去掉）
         if Counter(sass) != self.counter:
             if individual.fitness is None:
                 individual.fitness = self.evaluate_fitness(individual)
+                if individual.fitness != float("inf"):
+                    self.mut_valids += 1   
             return individual
 
         individual.sass = sass
@@ -166,4 +172,7 @@ class GeneticAlgorithm:
             population = next_gen
 
         best = min(population, key=lambda x: x.fitness)
+        print(f"Best fitness:{ best.fitness}")
+        print(f"success rate : {self.mut_valids/self.mut_attempts}")
+        print(f"move rate:{self.mut_moves/self.mut_attempts}")
         return best

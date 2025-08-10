@@ -175,7 +175,7 @@ def find_def_use(
                 else:
                     # logger.info(f'adding {line} with {accum}')
                     min_st_analysis[tmp_opcode] = accum
-                logger.info(f'resolve {tmp_opcode}')
+                # logger.info(f'resolve {tmp_opcode}')
                 resolved = True
                 resolved_opcode = tmp_opcode
                 break
