@@ -3,8 +3,6 @@ from copy import deepcopy
 from functools import lru_cache
 
 import numpy as np
-
-
 def decode(line: str):
     line = line.strip('\n')
     line = line.split(' ')
@@ -103,6 +101,17 @@ def decode(line: str):
             tmp = word.strip(']').strip('[')
             tmp = tmp.split('+')[0]  # R10+0x2000 -> R10
 
+            # XXX some possible suffix
+            # [R153.X4+0x10]
+            # SR_CTAID.Y
+            # 1.4426950216293334961
+            # R0.reuse
+            # if len(tmp.split('.')) > 1:
+            #     print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+            #     print(word)
+            #     print(tmp)
+            #     print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+            # XXX
 
             if tmp.endswith('reuse'):
                 meta['reuse'].append(tmp)

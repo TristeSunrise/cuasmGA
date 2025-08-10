@@ -71,29 +71,14 @@ class SafeMemMover:
                 del self.min_st_analysis[k]
 
     # ---------- 对外接口 ----------
-    def candidates(self, sass: List[str], *, refresh: bool = True) -> List[int]:
-        """
-        返回可移动的“内存指令”行号列表。
-        - refresh=True：根据当前 sass 做一次增量分析/更新（默认）
-        - 复用 self.min_st_analysis / self.black_list，不每次清空
-        """
-        if refresh:
-            sig = hash('\n'.join(sass))
-            if self._kernel_sig is None:
-                self._kernel_sig = sig
-            elif sig != self._kernel_sig:
-                # 核心序列大改（换 kernel），重置；如果只是小范围重排也会变，但仍可复用；
-                # 若你不想重置，可把下面两行注释掉。
-                # self.reset()
-                self._kernel_sig = sig
-
-            cands, *_ = static_analysis(
-                sass, self.ban_ops, self.memory_ops,
-                self.min_st_analysis, self.black_list, self.st_db
-            )
-            # 合并 + 剪枝，保持与原逻辑一致
-            self._merge_and_prune_min_st()
-            return cands
+    def candidates(self, sass):
+        cands, *_ = static_analysis(
+            sass,  # 用 decode/decode_ctrl_code
+            self.ban_ops, self.memory_ops,
+            self.min_st_analysis, self.black_list, self.st_db
+        )
+        self._merge_and_prune_min_st()
+        return cands
 
         # 不刷新，直接返回上次分析得到的 candidates（这里简单起见重新分析一次）
         cands, *_ = static_analysis(
@@ -107,25 +92,16 @@ class SafeMemMover:
         """返回 [can_move_up, can_move_down]（严格复刻 Sample 的 _generate_mask）"""
         return self._gen_mask_for_line(sass, lineno)
 
+# safe_mem_mover.py
     def step(self, sass: List[str], *, max_trials: int = 1) -> bool:
-        cands = self.candidates(sass, refresh=True)
-        if not cands:
-            return False
-
-        order = list(range(len(cands)))
-        self.rng.shuffle(order)
-        tried = 0
-        while order and tried < max_trials:
-            idx = order.pop()
-            lineno = cands[idx]
-            up, _down = self.mask(sass, lineno)   # 只看上移
-            if not up:
-                tried += 1
-                continue
-            # 上移：与上一行交换
-            self._swap_adjacent_in_place(sass, lineno, 0)
-            return True
+        cands = self.candidates(sass)     # 不清空，增量维护
+        for lineno in cands:              # 从上到下顺扫
+            up, _ = self.mask(sass, lineno)
+            if up:
+                self._swap_adjacent_in_place(sass, lineno, 0)  # 0=上移
+                return True
         return False
+
 
     # ---------- 内部：与 Sample._generate_mask 保持一致 ----------
     def _gen_mask_for_line(self, kernel_section: List[str], lineno: int) -> List[int]:
