@@ -1,0 +1,428 @@
+import os
+from copy import deepcopy
+
+import numpy as np
+
+from gpu_utils import get_gpu_cc, get_mutatable_ops, get_min_stall_count, get_st_window, check_adj_opcodes, get_st_database
+from logger import get_logger
+from static_analysis import static_analysis
+from decoder import decode,decode_ctrl_code
+
+CC = get_gpu_cc()
+MEMORY_OPS, BAN_OPS = get_mutatable_ops(CC)
+MEMORY_OPS_INDEX = {op: i for i, op in enumerate(MEMORY_OPS)}
+ST_WINDOW = get_st_window(CC)
+
+MIN_ST_ANALYSIS = {}
+ST_DB = get_st_database(CC)
+
+BLACK_LIST = set()
+
+logger = get_logger(__name__)
+
+
+class Sample:
+
+    def __init__(self, kernel_section: list[str]):
+        self.kernel_section = deepcopy(kernel_section)
+
+        self.candidates = []  # list of index mutable
+        self.dims = None
+        self._perf = None
+        self.actions = []
+
+    def __len__(self):
+        assert self.dims is not None, f'no dims'
+        return self.dims
+
+    @property
+    def perf(self):
+        return self._perf
+
+    @perf.setter
+    def perf(self, value):
+        self._perf = value
+
+    def apply(self, index, action):
+        lineno = self.candidates[index]
+        if action == 0:
+            # push down
+            if lineno > 0:
+
+                # print(self.kernel_section[lineno - 1])
+                # print(self.kernel_section[lineno])
+
+                self.kernel_section[lineno - 1], self.kernel_section[
+                    lineno] = self.kernel_section[lineno], self.kernel_section[
+                        lineno - 1]
+
+            # self.candidates[index] -= 1
+        elif action == 1:
+            if lineno < len(self.kernel_section) - 1:
+
+                # print(self.kernel_section[lineno])
+                # print(self.kernel_section[lineno+1])
+
+                self.kernel_section[lineno], self.kernel_section[
+                    lineno +
+                    1] = self.kernel_section[lineno +
+                                             1], self.kernel_section[lineno]
+            # self.candidates[index] += 1
+        else:
+            assert False, f'invalid action: {action}'
+
+    def static_analysis(self):
+        candidates, dims, kernel_lineno_cnt, mem_loc, max_src_len = static_analysis(
+            self.kernel_section,
+            BAN_OPS,
+            MEMORY_OPS,
+            MIN_ST_ANALYSIS,
+            BLACK_LIST,
+            ST_DB,
+        )
+        # update via DB
+        for k, v in MIN_ST_ANALYSIS.items():
+            if k in ST_DB:
+                updated = min(ST_DB[k], v)
+                MIN_ST_ANALYSIS[k] = updated
+                logger.info(f'updating {k}: {v} -> {updated}')
+        # prune
+        remove = []
+        for k, v in MIN_ST_ANALYSIS.items():
+            if v > 20:
+                remove.append(k)
+                logger.warning(f'pruning {k} -> {v}')
+            elif k.startswith('LDS'):
+                remove.append(k)
+                logger.warning(f'pruning {k} -> {v}')
+        for k in remove:
+            MIN_ST_ANALYSIS.pop(k)
+        # for k, v in ST_DB.items():
+        #     if k not in MIN_ST_ANALYSIS:
+        #         MIN_ST_ANALYSIS[k] = v
+
+        self.candidates = candidates
+        self.dims = dims
+        return dims, kernel_lineno_cnt, mem_loc, max_src_len
+
+    def embedding(self, space, mem_loc, max_src_len):
+        self.candidates.clear()
+        masks = []
+        *_, H, W = space.shape
+        embeds = np.zeros((H, W), dtype=np.float32)
+        cnt = 0
+        for lineno, line in enumerate(self.kernel_section):
+            line = line.strip()
+            # skip headers
+            if len(line) > 0 and line[0] == '[':
+                ctrl_code, _, predicate, opcode, dst, src, _ = decode(
+                    line)
+                if ctrl_code is None:
+                    # a label
+                    continue
+
+                op_embed = self.embed_opcode(opcode)
+                embed = self.embed_ctrl_code(ctrl_code) + \
+                        self.embed_predicate(predicate) + \
+                        op_embed + \
+                        self.embed_dst(dst, mem_loc) + \
+                        self.embed_src(src, mem_loc, max_src_len)
+
+                embeds[cnt] = np.array(embed, dtype=np.float32)
+                cnt += 1
+
+                # only memory ops are considered mutable candidates
+                if op_embed[0] != -1 and line not in BLACK_LIST:
+                    self.candidates.append(lineno)
+                    # TODO check bound of kernel_section?
+                    mask = self._generate_mask(
+                        ctrl_code,
+                        opcode,
+                        predicate,
+                        dst,
+                        src,
+                        self.kernel_section,
+                        lineno,
+                    )
+                    masks.append(mask)
+
+        # unsqueeze the first dim;
+        # so that it pre-appends `channel` dimension
+        # resulting shape: [1, 1, H, W]
+        embeds = np.expand_dims(embeds, axis=0)
+        return embeds, masks
+
+    def embed_ctrl_code(self, ctrl_code):
+        waits, r, w, yield_flag, stall_count = decode_ctrl_code(
+            ctrl_code)
+
+        barr = []
+        for i in range(6):
+            if i in waits:
+                barr.append(i)
+            else:
+                barr.append(-1)
+        r = -1 if r[1] == '-' else int(r[1])
+        w = -1 if w[1] == '-' else int(w[1])
+
+        yield_flag = 1 if yield_flag == 'Y' else 0
+        stall_count = int(stall_count[1:-1])
+        return barr + [r, w, yield_flag, stall_count]
+
+    def embed_predicate(self, predicate):
+        if predicate is None:
+            return [0]
+        return [1]
+
+    def embed_opcode(self, opcode):
+        # opcode is like: LDG.E.128.SYS
+        # i.e. {inst}.{modifier*}
+        memory_op = -1
+        ban = False
+        for op in BAN_OPS:
+            # if op in opcode:
+            if opcode.startswith(op):
+                ban = True
+                break
+
+        if not ban:
+            for op in MEMORY_OPS:
+                # if op in opcode:
+                if opcode.startswith(op):
+                    memory_op = MEMORY_OPS_INDEX[op]
+                    # memory_op = 1
+                    break
+        return [memory_op]
+
+    def embed_dst(self, dst, mem_loc):
+        if dst is None:
+            return [-1]
+
+        # debug
+        # if dst not in mem_loc:
+        #     for k, _ in mem_loc.items():
+        #         print(k)
+        #     raise RuntimeError(f'unknown memory location: {dst}')
+
+        # build
+        total = len(mem_loc)
+        return [mem_loc[dst] / total]
+
+    def embed_src(self, src, mem_loc, max_src_len):
+
+        # debug
+        # for s in src:
+        #     if s not in mem_loc:
+        #         for k, _ in mem_loc.items():
+        #             print(k)
+        #         raise RuntimeError(f'unknown memory location: {s}')
+
+        # build
+        total = len(mem_loc)
+        embedding = [mem_loc[s] / total for s in src]
+        diff = max_src_len - len(embedding)
+        padding = [-1] * diff
+
+        return embedding + padding
+
+    def _generate_mask(
+        self,
+        ctrl_code,
+        opcode,
+        predicate,
+        dst,
+        src,
+        kernel_section,
+        lineno,
+    ):
+        prev_line = kernel_section[lineno - 1].strip()
+        post_line = kernel_section[lineno + 1].strip()
+
+        mask = [1, 1]  # valid to move up and down
+        waits, r, w, _, self_stall_count = decode_ctrl_code(
+            ctrl_code)
+        r = -1 if r[1] == '-' else int(r[1])
+        w = -1 if w[1] == '-' else int(w[1])
+
+        # if MemOp were to move up
+        p_ctrl_code, _, p_predicate, p_opcode, p_dest, p_src, p_meta = decode(
+            prev_line)
+        if p_ctrl_code is None:
+            # NOT move across labels
+            mask[0] = 0
+        # direct dependencies
+        elif p_dest in src:
+            mask[0] = 0
+        elif dst in p_src:
+            mask[0] = 0
+        elif not check_adj_opcodes(
+                CC,
+                p_opcode,
+                opcode,
+                p_dest,
+                dst,
+                p_src,
+                src,
+                p_predicate,
+                predicate,
+                #
+                p_meta,
+        ):
+            mask[0] = 0
+        else:
+            # ban op
+            for op in BAN_OPS:
+                # if op in p_opcode:
+                if p_opcode.startswith(op):
+                    mask[0] = 0
+
+            # scoreboard
+            p_waits, p_r, p_w, _, p_stall_count = decode_ctrl_code(
+                p_ctrl_code)
+            p_r = -1 if p_r[1] == '-' else int(p_r[1])
+            p_w = -1 if p_w[1] == '-' else int(p_w[1])
+            if p_r in waits or p_w in waits or r in p_waits or w in p_waits:
+                mask[0] = 0
+
+            # stall count
+            ## for inst
+            total = int(p_stall_count[1:-1])
+            for i in range(1, 1 + ST_WINDOW):
+                if mask[0] == 0:
+                    break
+
+                try:
+                    tmp_ctrl, *_, tmp_opcode, _, tmp_src, _ = decode(
+                        kernel_section[lineno + i].strip())
+                except:
+                    # NOTE: decode gets error when (lineno + i) goes out of bounds,
+                    # this is a hack to skip
+                    tmp_ctrl = None
+                if tmp_ctrl is None:
+                    # if it is a label, don't care stall count
+                    continue
+                *_, stall_count = decode_ctrl_code(tmp_ctrl)
+
+                # move down check
+                min_st = get_min_stall_count(CC, p_opcode, tmp_opcode)
+                if p_opcode in MIN_ST_ANALYSIS:
+                    min_st = MIN_ST_ANALYSIS[p_opcode]
+
+                if p_dest in tmp_src and total <= min_st:
+                    mask[0] = 0
+
+                stall_count = int(stall_count[1:-1])
+                total += stall_count
+
+            ## for MemOp
+            total = 0
+            for i in range(2, 2 + ST_WINDOW):
+                if mask[0] == 0:
+                    break
+
+                tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src, _ = decode(
+                    kernel_section[lineno - i].strip())
+                if tmp_ctrl is None:
+                    # if it is a label, don't care stall count
+                    continue
+                *_, stall_count = decode_ctrl_code(tmp_ctrl)
+                stall_count = int(stall_count[1:-1])
+                total += stall_count
+
+                # moveup check
+                min_st = get_min_stall_count(CC, opcode, tmp_opcode)
+                if tmp_opcode in MIN_ST_ANALYSIS:
+                    min_st = MIN_ST_ANALYSIS[tmp_opcode]
+
+                if tmp_dst in src and total <= min_st:
+                    mask[0] = 0
+
+        # if MemOp were to move down
+        p_ctrl_code, _, p_predicate, p_opcode, p_dest, p_src, p_meta = decode(
+            post_line)
+        if p_ctrl_code is None:
+            # NOT move across labels
+            mask[1] = 0
+        # direct dependencies
+        elif dst in p_src:
+            mask[1] = 0
+        elif p_dest in src:
+            mask[1] = 0
+        elif not check_adj_opcodes(
+                CC,
+                opcode,
+                p_opcode,
+                dst,
+                p_dest,
+                src,
+                p_src,
+                predicate,
+                p_predicate,
+                #
+                p_meta,
+        ):
+            mask[1] = 0
+        else:
+            # ban op
+            for op in BAN_OPS:
+                # if op in p_opcode:
+                if p_opcode.startswith(op):
+                    mask[1] = 0
+
+            # scoreboard
+            p_wait, *_ = decode_ctrl_code(p_ctrl_code)
+            if r in p_wait or w in p_wait:
+                mask[1] = 0
+
+            # stall count
+            total = 0
+            ## for inst; move up several lines to check stall counts
+            for i in range(1, 1 + ST_WINDOW):
+                if mask[1] == 0:
+                    break
+
+                tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src, _ = decode(
+                    kernel_section[lineno - i].strip())
+                if tmp_ctrl is None:
+                    # if it is a label, don't care stall count
+                    continue
+                *_, stall_count = decode_ctrl_code(tmp_ctrl)
+
+                stall_count = int(stall_count[1:-1])
+                total += stall_count
+
+                # moveup check
+                min_st = get_min_stall_count(CC, p_opcode, tmp_opcode)
+                if tmp_opcode in MIN_ST_ANALYSIS:
+                    min_st = MIN_ST_ANALYSIS[tmp_opcode]
+
+                if tmp_dst in p_src and total <= min_st:
+                    mask[1] = 0
+
+            ## for memOp (users of memOp will set deps barrier)
+            # total = int(self_stall_count[1:-1])
+            # for i in range(2, 2 + ST_WINDOW):
+            #     if mask[1] == 0:
+            #         break
+
+            #     try:
+            #         tmp_ctrl, *_, tmp_opcode, tmp_dst, tmp_src = self.engine.decode(
+            #             kernel_section[lineno + i].strip())
+            #     except:
+            #         # NOTE: decode gets error when (lineno + i) goes out of bounds,
+            #         # this is a hack to skip
+            #         tmp_ctrl = None
+            #     if tmp_ctrl is None:
+            #         # if it is a label, don't care stall count
+            #         continue
+            #     *_, stall_count = self.engine.decode_ctrl_code(tmp_ctrl)
+
+            #     # move down check
+            #     min_st = get_min_stall_count(CC, opcode, tmp_opcode)
+            #     if dst in tmp_src and total <= min_st:
+            #         mask[1] = 0
+
+            #     stall_count = int(stall_count[1:-1])
+            #     total += stall_count
+
+        return mask

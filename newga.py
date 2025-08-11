@@ -3,12 +3,14 @@ from typing import List, Optional, Callable
 from collections import Counter
 import random
 
+import numpy as np
+
 from sass_kernel import SassKernel
 from sassgen import write_sass_file
 
 # 只负责“发现候选 + 掩码 + 相邻交换”的安全移动器
 from safe_mem_mover import SafeMemMover
-
+from sample import Sample
 
 # ========= 超参数 =========
 POP_SIZE        = 10
@@ -117,25 +119,57 @@ class GeneticAlgorithm:
                 individual.fitness = self.evaluate_fitness(individual)
             return individual
 
-        self.mut_attempts += 1  
-        sass = individual.sass[:]
-        changed = self.mover.step(sass, max_trials=1)
-        if not changed:
-            # 没动成就不评估，保留原 fitness
+        self.mut_attempts += 1
+
+        # 1) 构造一个 Sample（严格复用原作者候选与 mask 逻辑）
+        sass = individual.sass[:]  # 拷贝一份做就地交换
+        sample = Sample(sass) 
+        dims, total, mem_loc, max_src_len = sample.static_analysis()
+
+        if dims == 0:
+            # 没有任何 mem 指令候选
             if individual.fitness is None:
                 individual.fitness = self.evaluate_fitness(individual)
-            return individual
-        self.mut_moves += 1
-        # 多重集守恒保险（可去掉）
-        if Counter(sass) != self.counter:
-            if individual.fitness is None:
-                individual.fitness = self.evaluate_fitness(individual)
-                if individual.fitness != float("inf"):
-                    self.mut_valids += 1   
             return individual
 
-        individual.sass = sass
+        # 2) 和 Env._build_state 一样，构造 dummy 的 space 拿到 masks
+        n_feat = 10 + 1 + 1 + 1 + max_src_len
+        dummy_space = np.zeros((1, total, n_feat), dtype=np.float32)
+        _, masks = sample.embedding(dummy_space, mem_loc, max_src_len)  # masks: [[up,down], ...]
+
+        # 3) 构造“离散动作空间”的合法动作列表（完全照 RL 的编码）
+        #    action = idx*2 + dir  (dir: 0=上移, 1=下移)；这里不包含 noop
+        valid_actions = []
+        for i, (up, down) in enumerate(masks):
+            if up:   valid_actions.append(i * 2 + 0)  # 上移
+            if down: valid_actions.append(i * 2 + 1)  # 下移
+
+        if not valid_actions:
+            # 没有任何合法动作，相当于 noop
+            if individual.fitness is None:
+                individual.fitness = self.evaluate_fitness(individual)
+            return individual
+
+        # 4) 采样一个合法动作并执行（完全复用 Sample.apply 的语义）
+        action = random.choice(valid_actions)
+        index, direction = divmod(action, 2)  # dir==0 上移；dir==1 下移（和 Env 一致）
+        before = sample.kernel_section[:]
+        sample.apply(index, direction)
+
+        # 5) 多重集守恒（只是保险，交换相邻行理论上不会变）
+        after = sample.kernel_section
+        if Counter(after) != Counter(before):
+            # 理论上不应发生；保守回退
+            if individual.fitness is None:
+                individual.fitness = self.evaluate_fitness(individual)
+            return individual
+
+        # 6) 写回个体并评估
+        individual.sass = after
+        self.mut_moves += 1
         individual.fitness = self.evaluate_fitness(individual)
+        if individual.fitness != float("inf"):
+            self.mut_valids += 1
         return individual
 
     # ---------- 选择 ----------
