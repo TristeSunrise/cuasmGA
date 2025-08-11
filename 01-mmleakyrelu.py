@@ -30,8 +30,6 @@ class Config:
     n: int = 1
     k: int = 1
 
-
-    ## Agent
     gpu: int = 0
 
 
@@ -48,9 +46,6 @@ def parse_args() -> Config:
     parser.add_argument("-m", type=int, default=512)
     parser.add_argument("-n", type=int, default=512)
     parser.add_argument("-k", type=int, default=2048)
-
-
-
 
     args = parser.parse_args()
     config = Config(**vars(args))

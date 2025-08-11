@@ -148,6 +148,7 @@ def run_ga(
     bin.asm['cubin'] = cubin
 
     save_path = os.path.join(config.default_out_path, config.save_dir)
+    ga.save_history(os.path.join(save_path,"ga_history.csv")) 
     save_data(bin, best.fitness, save_path)
     
 

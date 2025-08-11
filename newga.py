@@ -2,20 +2,19 @@
 from typing import List, Optional, Callable
 from collections import Counter
 import random
-
+import time, csv, hashlib, statistics
 import numpy as np
 
 from sass_kernel import SassKernel
 from sassgen import write_sass_file
 
-# 只负责“发现候选 + 掩码 + 相邻交换”的安全移动器
-from safe_mem_mover import SafeMemMover
+
 from sample import Sample
 
 # ========= 超参数 =========
 POP_SIZE        = 10
 MUTATION_RATE   = 1.0    # 只靠变异，建议 1.0
-NUM_GENERATIONS = 200
+NUM_GENERATIONS = 5000
 ELITE_SIZE      = 4
 
 
@@ -43,15 +42,49 @@ class GeneticAlgorithm:
         self.sasskernel = sasskernel
         self.test_correctness = test_correctness
         self.test_performance = test_performance
+        self.history = []              # 每代记录一条
+        self._t0 = time.time() 
         self.mut_attempts = 0   # 变异尝试次数
         self.mut_moves    = 0   # 做成一次合法交换的次数
-        self.mut_valids   = 0   # 变异后可运行（通过正确性门）的次数
-
-        # 多重集守恒（理论上相邻交换必然守恒，这里只是留个断言工具）
+        self.mut_valids   = 0   # 变异后可运行的次数
+        self.history = []              # 每代记录一条
+        self._t0 = time.time() 
+        # 多重集守恒
         self.counter = Counter(kernel_section)
-        # 安全移动器（无 engine 依赖，复用你 decoder.py 的两个函数）
-        self.mover = SafeMemMover()
+        # 安全移动器
+    @staticmethod
+    def _sig(sass_lines):
+        return hashlib.sha1("\n".join(sass_lines).encode()).hexdigest()[:12]
 
+    def _record_gen(self, gen_idx: int, population):
+        fits = [ind.fitness for ind in population]
+        best_ind = min(population, key=lambda x: x.fitness)
+        rec = {
+            "gen": gen_idx,
+            "best_fitness": best_ind.fitness,
+            "best_sig": self._sig(best_ind.sass),
+            "mean_fitness": float(sum(fits) / len(fits)),
+            "median_fitness": float(statistics.median(fits)),
+            "std_fitness": float(statistics.pstdev(fits)) if len(fits) > 1 else 0.0,
+            "mut_attempts": int(self.mut_attempts),
+            "mut_moves": int(self.mut_moves),
+            "mut_valids": int(self.mut_valids),
+            "move_rate": float(self.mut_moves / self.mut_attempts) if self.mut_attempts else 0.0,
+            "valid_rate": float(self.mut_valids / max(1, self.mut_moves)),
+            "elapsed_sec": float(time.time() - self._t0),
+        }
+        self.history.append(rec)
+        self.mut_attempts = self.mut_moves = self.mut_valids = 0
+
+    def save_history(self, path: str):
+        if not self.history:
+            return
+        keys = list(self.history[0].keys())
+        with open(path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=keys)
+            w.writeheader()
+            for row in self.history:
+                w.writerow(row)
     # ---------- 评估 ----------
     def evaluate_fitness(self, individual: Individual) -> float:
         try:
@@ -68,35 +101,14 @@ class GeneticAlgorithm:
             individual.fitness = float("inf")
             return individual.fitness
 
-    # ---------- 初始化：基线 + 若干近邻 ----------
+    # ---------- 初始化：基线----------
     def initialize_population(self, original_kernel_section: List[str]) -> List[Individual]:
         population: List[Individual] = []
 
-        # (a) 基线个体（保证至少有一个可运行）
+        # 基线个体
         base = Individual(original_kernel_section[:])
         base.fitness = self.evaluate_fitness(base)
         population.append(base)
-
-        # (b) 其余个体：从基线拷贝，做 1~2 次安全相邻交换
-        tries = 0
-        while len(population) < POP_SIZE and tries < POP_SIZE * 40:
-            tries += 1
-            sass = original_kernel_section[:]
-            changed = False
-            for _ in range(random.randint(1, 2)):
-                if self.mover.step(sass, max_trials=20):  # 成功一次就记为 changed
-                    changed = True
-            if not changed:
-                continue
-
-            # 多重集守恒保险
-            if Counter(sass) != self.counter:
-                continue
-
-            ind = Individual(sass)
-            ind.fitness = self.evaluate_fitness(ind)
-            if ind.fitness != float("inf"):
-                population.append(ind)
 
         # 不足时用基线拷贝补齐
         while len(population) < POP_SIZE:
@@ -106,7 +118,7 @@ class GeneticAlgorithm:
 
         return population
 
-    # ---------- crossover：恒等交叉（可直接不调用） ----------
+    # ---------- crossover：恒等交叉----------
     def crossover(self, parent1: Individual, parent2: Individual):
         c1 = Individual(parent1.sass[:]); c1.fitness = parent1.fitness
         c2 = Individual(parent2.sass[:]); c2.fitness = parent2.fitness
@@ -121,7 +133,7 @@ class GeneticAlgorithm:
 
         self.mut_attempts += 1
 
-        # 1) 构造一个 Sample（严格复用原作者候选与 mask 逻辑）
+        # 1) 构造一个 Sample
         sass = individual.sass[:]  # 拷贝一份做就地交换
         sample = Sample(sass) 
         dims, total, mem_loc, max_src_len = sample.static_analysis()
@@ -132,7 +144,7 @@ class GeneticAlgorithm:
                 individual.fitness = self.evaluate_fitness(individual)
             return individual
 
-        # 2) 和 Env._build_state 一样，构造 dummy 的 space 拿到 masks
+        # 2) 构造 dummy 的 space 拿到 masks
         n_feat = 10 + 1 + 1 + 1 + max_src_len
         dummy_space = np.zeros((1, total, n_feat), dtype=np.float32)
         _, masks = sample.embedding(dummy_space, mem_loc, max_src_len)  # masks: [[up,down], ...]
@@ -185,7 +197,7 @@ class GeneticAlgorithm:
         print(f"original kernel fitness: {origin.fitness}")
 
         population = self.initialize_population(original_kernel)
-
+        self._record_gen(0,population)
         for gen in range(NUM_GENERATIONS):
             if gen%5 == 0 and self.mut_attempts > 0:
                 print(f"success rate : {self.mut_valids/self.mut_attempts}")
@@ -206,6 +218,7 @@ class GeneticAlgorithm:
                     next_gen.append(self.mutate(c2))
 
             population = next_gen
+            self._record_gen(gen, population)
 
         best = min(population, key=lambda x: x.fitness)
         print(f"Best fitness:{ best.fitness}")

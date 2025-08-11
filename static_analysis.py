@@ -173,7 +173,7 @@ def find_def_use(
                 else:
                     # logger.info(f'adding {line} with {accum}')
                     min_st_analysis[tmp_opcode] = accum
-                logger.info(f'resolve {tmp_opcode}')
+                # logger.info(f'resolve {tmp_opcode}')
                 resolved = True
                 resolved_opcode = tmp_opcode
                 break
@@ -188,7 +188,7 @@ def find_def_use(
         if resolved:
             break
 
-    if not resolved:
-        logger.warning(f'cannot resolve stall count {line} for {src}')
+    # if not resolved:
+    #     logger.warning(f'cannot resolve stall count {line} for {src}')
 
     return resolved, resolved_opcode
