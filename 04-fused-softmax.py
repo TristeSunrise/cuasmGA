@@ -199,12 +199,12 @@ def main():
     else:
         load_dir = args.load
 
-    @autotune(
+    @fgk_autotune(
         configs=[
             triton.Config({'BLOCK_SIZE': BLOCK_SIZE}, num_stages=4, num_warps=8),
         ],
         key=['n_rows', 'n_cols'],
-        drl_config=args,
+        ga_config=args,
         ret_ptr=0,
     )
     @jit

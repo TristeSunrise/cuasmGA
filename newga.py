@@ -47,7 +47,6 @@ class GeneticAlgorithm:
         self.mut_attempts = 0   # 变异尝试次数
         self.mut_moves    = 0   # 做成一次合法交换的次数
         self.mut_valids   = 0   # 变异后可运行的次数
-        self.history = []              # 每代记录一条
         self._t0 = time.time() 
         # 多重集守恒
         self.counter = Counter(kernel_section)
@@ -55,6 +54,7 @@ class GeneticAlgorithm:
     @staticmethod
     def _sig(sass_lines):
         return hashlib.sha1("\n".join(sass_lines).encode()).hexdigest()[:12]
+
 
     def _record_gen(self, gen_idx: int, population):
         fits = [ind.fitness for ind in population]
@@ -222,6 +222,6 @@ class GeneticAlgorithm:
 
         best = min(population, key=lambda x: x.fitness)
         print(f"Best fitness:{ best.fitness}")
-        print(f"success rate : {self.mut_valids/self.mut_attempts}")
-        print(f"move rate:{self.mut_moves/self.mut_attempts}")
+        # print(f"success rate : {self.mut_valids/self.mut_attempts}")
+        # print(f"move rate:{self.mut_moves/self.mut_attempts}") 除以0报错
         return best
