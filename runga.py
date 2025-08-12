@@ -148,7 +148,14 @@ def run_ga(
     bin.asm['cubin'] = cubin
 
     save_path = os.path.join(config.default_out_path, config.save_dir)
-    ga.save_history(os.path.join(save_path,"ga_history.csv")) 
+    os.makedirs(save_path, exist_ok=True)  # 确保目录存在
+
+    try:
+        ga.save_history(os.path.join(save_path, 'ga_history.csv'))
+        print("历史记录保存成功")
+    except Exception as e:
+        print(f"保存历史记录失败: {e}")
+        
     save_data(bin, best.fitness, save_path)
     
 

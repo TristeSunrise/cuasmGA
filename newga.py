@@ -14,7 +14,7 @@ from sample import Sample
 # ========= 超参数 =========
 POP_SIZE        = 10
 MUTATION_RATE   = 1.0    # 只靠变异，建议 1.0
-NUM_GENERATIONS = 5000
+NUM_GENERATIONS = 2000
 ELITE_SIZE      = 4
 
 
