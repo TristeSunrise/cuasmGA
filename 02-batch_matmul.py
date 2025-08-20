@@ -357,7 +357,7 @@ def main():
             ],  
             styles=[('blue', '-'), ('green', '-'), ('red', '-')], 
             ylabel="GB/s",  # label name for the y-axis
-            plot_name="softmax-performance",  
+            plot_name="batch_matmul",  
             #args={'M': 4096},  # values for function arguments not in `x_names` and `y_name`
             args={},
         ))

@@ -404,7 +404,7 @@ def main():
 
             styles=[("green", "-"), ("blue", "-"), ('red', '-')],
             ylabel="TFLOPS",  # Label name for the y-axis
-            plot_name="matmul-performance-" + "fp16",
+            plot_name="fused_feedforward",
             args={"fp8_inputs": None},
         ))
 

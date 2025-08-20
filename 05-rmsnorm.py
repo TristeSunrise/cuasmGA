@@ -199,3 +199,40 @@ if __name__ == '__main__':
 
     if ga_config.tt:
         out_rms_triton = call_tt(x=embeddings_load, rms_w=rms_weights)
+
+    if not ga_config.bench:
+        return 
+    torch.cuda.synchronize()
+
+    configs = []
+    configs.append(
+        triton.testing.Benchmark(
+            x_names=["NA"],  # Argument names to use as an x-axis for the plot
+            # x_vals=[128 * i for i in range(2, 33)],  # Different possible values for `x_name`
+            #x_vals=[2 ** i for i in range(8, 13)],  # Different possible values for `x_name`
+            x_vals=[0],  # Different possible values for `x_name`
+            line_arg="provider",  # Argument name whose value corresponds to a different line in the plot
+            line_vals=['ga', 'triton', 'torch'],
+            line_names=['ga', 'triton', 'torch'],
+            styles=[("green", "-"), ("blue", "-"), ('red', '-')],
+            ylabel="TFLOPS",  # Label name for the y-axis
+            plot_name='bmm',
+            args={"fp8_inputs": None},
+        ))
+
+    @triton.testing.perf_report(configs)
+    def benchmark(NA, provider, fp8_inputs):
+        quantiles = [0.5, 0.2, 0.8]
+        if provider == 'torch':
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: rms_norm_pytorch(embeddings_load, rms_weights), quantiles=quantiles, warmup=100, rep=100)
+        if provider == 'ga':
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: call(_ga, load_dir, embeddings_load, rms_weights), quantiles=quantiles, warmup=100, rep=100)
+        if provider == 'triton':
+            ms, min_ms, max_ms = triton.testing.do_bench(lambda: call_tt(embeddings_load, rms_weights), quantiles=quantiles, warmup=100, rep=100)
+        perf = lambda ms: batch * heads * seq_len * dim * 1e-9 / (ms * 1e-3) # gflops
+        return perf(ms), perf(max_ms), perf(min_ms)
+    
+    benchmark.run(show_plots=True, print_data=True)
+
+if __name__ == '__main__':
+    main()
