@@ -34,37 +34,6 @@ class Config:
     D_HEAD: int = 64
     causal: bool = False
 
-    # RL
-    train: int = 1
-    log: int = 1
-    verbose: int = 0
-    ## Env
-    env_id: str = 'cuasmenv-v0'
-    num_env: int = 1
-    num_iterations: int = 200
-    minibatch_size: int = 8
-    horizon: int = 32
-    num_steps: int = 64
-    normalize_reward: int = 0
-    ckpt_freq: int = 100
-    ## Agent
-    agent: str = "ppo"
-    weights_path: Optional[str] = None
-    agent_id: Optional[str] = None
-    anneal_lr: int = 1
-    gae: int = 1
-    norm_adv: int = 1
-    clip_vloss: int = 1
-    update_epochs: int = 4
-    lr: float = 2.5e-4
-    gamma: float = 0.99
-    gae_lambda: float = 0.95
-    clip_coef: float = 0.2
-    ent_coef: float = 0.01
-    vf_coef: float = 0.5
-    max_grad_norm: float = 0.5
-    target_kl: Optional[float] = None
-    gpu: int = 0
 
 
 def parse_args() -> Config:
@@ -85,35 +54,7 @@ def parse_args() -> Config:
     parser.add_argument("--dh", type=int, dest="D_HEAD", default=32)
     parser.add_argument('--causal', default=False, action=argparse.BooleanOptionalAction)
 
-    parser.add_argument("-t", "--train", type=int, dest="train", default=1)
-    parser.add_argument("-l", "--log", type=int, dest="log", default=1)
-    parser.add_argument("--verbose", type=int, default=0)
 
-    parser.add_argument("--env_id", type=str, default='cuasmenv-v0')
-    parser.add_argument("--num_iterations", type=int, default=int(200))
-    parser.add_argument("--minibatch_size", type=int, default=8)
-    parser.add_argument("--horizon", type=int, dest="horizon", default=32)
-    parser.add_argument("--num_steps", type=int, default=64)
-    parser.add_argument("--normalize_reward", type=int, default=0)
-    parser.add_argument("--ckpt_freq", type=int, default=100)
-
-    parser.add_argument("--agent", type=str, default="ppo")
-    parser.add_argument("--weights_path", type=str)
-    parser.add_argument("--agent_id", type=str)
-    parser.add_argument("--anneal_lr", type=int, default=1)
-    parser.add_argument("--gae", type=int, default=1)
-    parser.add_argument("--norm_adv", type=int, default=1)
-    parser.add_argument("--clip_vloss", type=int, default=1)
-    parser.add_argument("--update_epochs", type=int, default=4)
-    parser.add_argument("--lr", type=float, default=2.5e-4)
-    parser.add_argument("--gamma", type=float, default=0.99)
-    parser.add_argument("--gae_lambda", type=float, default=0.95)
-    parser.add_argument("--clip_coef", type=float, default=0.2)
-    parser.add_argument("--ent_coef", type=float, default=0.01)
-    parser.add_argument("--vf_coef", type=float, default=0.5)
-    parser.add_argument("--max_grad_norm", type=float, default=0.5)
-    parser.add_argument("--target_kl", type=float)
-    parser.add_argument("--gpu", type=int, default=0)
 
     args = parser.parse_args()
     config = Config(**vars(args))
