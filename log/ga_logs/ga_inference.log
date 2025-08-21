@@ -1,0 +1,490 @@
+[1;32m2025-08-20 20:40:20,419 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 26.02it/s]
+[1;32m2025-08-20 20:40:20,498 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:20,499 - INFO - run ga_kernel_0d1d2d3de4_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:20,499 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 123261320692528
+✅ Triton and SIP match
+[BENCH]: cublas; 512; 512; 2048
+[BENCH]: ga; 512; 512; 2048
+[BENCH]: triton; 512; 512; 2048
+matmul-performance:
+       M      N     cuBLAS         Ga     Triton
+0  512.0  512.0  43.759514  13.606639  14.871922
+[1;32m2025-08-20 20:40:25,477 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 27.36it/s]
+[1;32m2025-08-20 20:40:25,553 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:25,554 - INFO - run ga_kernel_0d1d2d3de4_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:25,554 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 135556992009072
+✅ Triton and SIP match
+[BENCH]: cublas; 512; 512; 2048
+[BENCH]: ga; 512; 512; 2048
+[BENCH]: triton; 512; 512; 2048
+matmul-performance:
+       M      N     cuBLAS         Ga     Triton
+0  512.0  512.0  44.081413  16.266535  16.018939
+[1;32m2025-08-20 20:40:30,440 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 27.35it/s]
+[1;32m2025-08-20 20:40:30,516 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:30,516 - INFO - run ga_kernel_0d1d2d3de4_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:30,516 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 135937595867920
+✅ Triton and SIP match
+[BENCH]: cublas; 512; 512; 2048
+[BENCH]: ga; 512; 512; 2048
+[BENCH]: triton; 512; 512; 2048
+matmul-performance:
+       M      N     cuBLAS         Ga     Triton
+0  512.0  512.0  43.916031  12.919128  12.301493
+[1;32m2025-08-20 20:40:35,493 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.94it/s]
+[1;32m2025-08-20 20:40:35,573 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:35,573 - INFO - run ga_kernel_0d1d2d3de4_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:35,573 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 125675857740656
+✅ Triton and SIP match
+[BENCH]: cublas; 512; 512; 2048
+[BENCH]: ga; 512; 512; 2048
+[BENCH]: triton; 512; 512; 2048
+matmul-performance:
+       M      N    cuBLAS         Ga     Triton
+0  512.0  512.0  43.43422  12.085252  15.161268
+[1;32m2025-08-20 20:40:40,622 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/mm_leakyRelu/512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.98it/s]
+[1;32m2025-08-20 20:40:40,703 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:40,703 - INFO - run ga_kernel_0d1d2d3de4_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:40,703 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 129662602412816
+✅ Triton and SIP match
+[BENCH]: cublas; 512; 512; 2048
+[BENCH]: ga; 512; 512; 2048
+[BENCH]: triton; 512; 512; 2048
+matmul-performance:
+       M      N     cuBLAS         Ga     Triton
+0  512.0  512.0  43.522817  11.677855  11.877433
+[1;32m2025-08-20 20:40:45,608 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.65it/s]
+[1;32m2025-08-20 20:40:45,688 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:45,689 - INFO - run ga_0d1d2d3de4de5de6d_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:45,689 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 130248350172432
+batch_matmul:
+    NA     Triton      Torch         ga
+0  0.0  26.945389  72.835578  25.643434
+[1;32m2025-08-20 20:40:50,477 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.37it/s]
+[1;32m2025-08-20 20:40:50,558 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:50,559 - INFO - run ga_0d1d2d3de4de5de6d_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:50,559 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 137326576305392
+batch_matmul:
+    NA     Triton      Torch         ga
+0  0.0  19.703738  69.508592  19.614755
+[1;32m2025-08-20 20:40:55,365 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 27.18it/s]
+[1;32m2025-08-20 20:40:55,442 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:40:55,443 - INFO - run ga_0d1d2d3de4de5de6d_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:40:55,443 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 138775327147248
+batch_matmul:
+    NA     Triton      Torch         ga
+0  0.0  21.280227  68.644847  30.791107
+[1;32m2025-08-20 20:41:00,296 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.57it/s]
+[1;32m2025-08-20 20:41:00,377 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:00,377 - INFO - run ga_0d1d2d3de4de5de6d_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:00,377 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 130464723797264
+batch_matmul:
+    NA     Triton      Torch         ga
+0  0.0  21.021203  68.709042  23.593118
+[1;32m2025-08-20 20:41:05,109 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/bmm/2_512_512_2048 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 26.79it/s]
+[1;32m2025-08-20 20:41:05,186 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:05,187 - INFO - run ga_0d1d2d3de4de5de6d_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:05,187 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 131484266644816
+batch_matmul:
+    NA     Triton      Torch         ga
+0  0.0  27.583889  71.366887  22.975794
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 428, in <module>
+    main()
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 364, in main
+    out = call(B*M, N, K, x, x_reshape, w1_w, w3_w, rms_w, o, grid, ga_kernel, load_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 200, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 55, in run_selection
+    raise RuntimeError(f'no valid cubin found in {cubin_dir_path}')
+RuntimeError: no valid cubin found in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 428, in <module>
+    main()
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 364, in main
+    out = call(B*M, N, K, x, x_reshape, w1_w, w3_w, rms_w, o, grid, ga_kernel, load_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 200, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 55, in run_selection
+    raise RuntimeError(f'no valid cubin found in {cubin_dir_path}')
+RuntimeError: no valid cubin found in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 428, in <module>
+    main()
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 364, in main
+    out = call(B*M, N, K, x, x_reshape, w1_w, w3_w, rms_w, o, grid, ga_kernel, load_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 200, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 55, in run_selection
+    raise RuntimeError(f'no valid cubin found in {cubin_dir_path}')
+RuntimeError: no valid cubin found in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 428, in <module>
+    main()
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 364, in main
+    out = call(B*M, N, K, x, x_reshape, w1_w, w3_w, rms_w, o, grid, ga_kernel, load_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 200, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 55, in run_selection
+    raise RuntimeError(f'no valid cubin found in {cubin_dir_path}')
+RuntimeError: no valid cubin found in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 428, in <module>
+    main()
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 364, in main
+    out = call(B*M, N, K, x, x_reshape, w1_w, w3_w, rms_w, o, grid, ga_kernel, load_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/03-fused_feedforward.py", line 200, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 55, in run_selection
+    raise RuntimeError(f'no valid cubin found in {cubin_dir_path}')
+RuntimeError: no valid cubin found in data/NVIDIA_A100-SXM4-80GB/fused_ff/1_512_512_1024
+[1;32m2025-08-20 20:41:27,629 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.31it/s]
+[1;32m2025-08-20 20:41:27,711 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:27,711 - INFO - run ga_kernel_0d1d2de3de_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:27,711 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 126617593839824
+softmax-performance:
+    NA      Triton       Torch          ga
+0  0.0  596.505593  650.644935  318.535666
+[1;32m2025-08-20 20:41:32,440 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.26it/s]
+[1;32m2025-08-20 20:41:32,522 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:32,522 - INFO - run ga_kernel_0d1d2de3de_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:32,523 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 127421689053456
+softmax-performance:
+    NA      Triton       Torch          ga
+0  0.0  267.673783  638.013701  491.891278
+[1;32m2025-08-20 20:41:37,114 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 26.70it/s]
+[1;32m2025-08-20 20:41:37,192 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:37,192 - INFO - run ga_kernel_0d1d2de3de_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:37,193 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 139692497780976
+softmax-performance:
+    NA      Triton       Torch          ga
+0  0.0  232.077535  651.286836  347.291918
+[1;32m2025-08-20 20:41:41,922 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 26.07it/s]
+[1;32m2025-08-20 20:41:42,002 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:42,002 - INFO - run ga_kernel_0d1d2de3de_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:42,002 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 136156878684400
+softmax-performance:
+    NA      Triton       Torch          ga
+0  0.0  370.884496  648.582504  275.421353
+[1;32m2025-08-20 20:41:46,669 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/persistent_softmax/512_4096 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 25.92it/s]
+[1;32m2025-08-20 20:41:46,749 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:46,749 - INFO - run ga_kernel_0d1d2de3de_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:46,749 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+✅ out match
+benchmarking: M=512; N=4096
+[93mJIT compile[0m
+[CompiledKernel] loading 139121877385392
+softmax-performance:
+    NA      Triton       Torch          ga
+0  0.0  352.181127  638.385177  322.144053
+[1;32m2025-08-20 20:41:51,510 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 28.02it/s]
+[1;32m2025-08-20 20:41:51,584 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:51,585 - INFO - run _ga_0d1d2d3de4de5c6c_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:51,585 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 132540042154608
+bmm:
+    NA         ga     triton
+0  0.0  75.317912  72.797557
+[1;32m2025-08-20 20:41:56,097 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 29.22it/s]
+[1;32m2025-08-20 20:41:56,168 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:41:56,169 - INFO - run _ga_0d1d2d3de4de5c6c_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:41:56,169 - INFO - verification time: 0.07s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 140332774822448
+bmm:
+    NA        ga     triton
+0  0.0  91.72288  83.912931
+[1;32m2025-08-20 20:42:00,721 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 27.61it/s]
+[1;32m2025-08-20 20:42:00,796 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:42:00,797 - INFO - run _ga_0d1d2d3de4de5c6c_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:42:00,797 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 132073872511696
+bmm:
+    NA        ga     triton
+0  0.0  87.41047  72.656319
+[1;32m2025-08-20 20:42:05,286 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 29.17it/s]
+[1;32m2025-08-20 20:42:05,357 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:42:05,358 - INFO - run _ga_0d1d2d3de4de5c6c_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:42:05,358 - INFO - verification time: 0.07s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 129120182899216
+bmm:
+    NA         ga     triton
+0  0.0  77.283019  73.326993
+[1;32m2025-08-20 20:42:09,921 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/rmsnorm/1_32_4096_64 (selection.py:57)[0m
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 27.10it/s]
+[1;32m2025-08-20 20:42:09,998 - INFO - ✅ kernel verified for 2 test samples (verify.py:235)[0m
+[1;32m2025-08-20 20:42:09,998 - INFO - run _ga_0d1d2d3de4de5c6c_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-20 20:42:09,998 - INFO - verification time: 0.08s (selection.py:113)[0m
+[93mSIP JIT[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 140374722040336
+bmm:
+    NA         ga     triton
+0  0.0  91.291664  73.285994
+[1;32m2025-08-20 20:42:14,620 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]  0%|          | 0/10 [00:00<?, ?it/s]
+[33;20m2025-08-20 20:42:14,758 - WARNING - run ga_kernel_0d1d2d34d5_0.pkl verify failed: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+ (selection.py:100)[0m
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/06-fused-attention.py", line 635, in <module>
+    main()
+  File "/workspace/cuasmGA/06-fused-attention.py", line 471, in main
+    fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, ga_kernel, load_dir)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/06-fused-attention.py", line 125, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 103, in run_selection
+    torch.cuda.empty_cache()  # free test memory
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/.venv/lib/python3.11/site-packages/torch/cuda/memory.py", line 159, in empty_cache
+    torch._C._cuda_emptyCache()
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[1;32m2025-08-20 20:42:18,349 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]  0%|          | 0/10 [00:00<?, ?it/s]
+[33;20m2025-08-20 20:42:18,483 - WARNING - run ga_kernel_0d1d2d34d5_0.pkl verify failed: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+ (selection.py:100)[0m
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/06-fused-attention.py", line 635, in <module>
+    main()
+  File "/workspace/cuasmGA/06-fused-attention.py", line 471, in main
+    fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, ga_kernel, load_dir)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/06-fused-attention.py", line 125, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 103, in run_selection
+    torch.cuda.empty_cache()  # free test memory
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/.venv/lib/python3.11/site-packages/torch/cuda/memory.py", line 159, in empty_cache
+    torch._C._cuda_emptyCache()
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[1;32m2025-08-20 20:42:22,206 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]  0%|          | 0/10 [00:00<?, ?it/s]
+[33;20m2025-08-20 20:42:22,339 - WARNING - run ga_kernel_0d1d2d34d5_0.pkl verify failed: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+ (selection.py:100)[0m
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/06-fused-attention.py", line 635, in <module>
+    main()
+  File "/workspace/cuasmGA/06-fused-attention.py", line 471, in main
+    fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, ga_kernel, load_dir)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/06-fused-attention.py", line 125, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 103, in run_selection
+    torch.cuda.empty_cache()  # free test memory
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/.venv/lib/python3.11/site-packages/torch/cuda/memory.py", line 159, in empty_cache
+    torch._C._cuda_emptyCache()
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[1;32m2025-08-20 20:42:26,004 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]  0%|          | 0/10 [00:00<?, ?it/s]
+[33;20m2025-08-20 20:42:26,136 - WARNING - run ga_kernel_0d1d2d34d5_0.pkl verify failed: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+ (selection.py:100)[0m
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/06-fused-attention.py", line 635, in <module>
+    main()
+  File "/workspace/cuasmGA/06-fused-attention.py", line 471, in main
+    fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, ga_kernel, load_dir)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/06-fused-attention.py", line 125, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 103, in run_selection
+    torch.cuda.empty_cache()  # free test memory
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/.venv/lib/python3.11/site-packages/torch/cuda/memory.py", line 159, in empty_cache
+    torch._C._cuda_emptyCache()
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[1;32m2025-08-20 20:42:29,775 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]  0%|          | 0/10 [00:00<?, ?it/s]
+[33;20m2025-08-20 20:42:29,909 - WARNING - run ga_kernel_0d1d2d34d5_0.pkl verify failed: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+ (selection.py:100)[0m
+Traceback (most recent call last):
+  File "/workspace/cuasmGA/06-fused-attention.py", line 635, in <module>
+    main()
+  File "/workspace/cuasmGA/06-fused-attention.py", line 471, in main
+    fgk_out = call(q, k, v, M, o, grid, causal, sm_scale, ga_kernel, load_dir)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/06-fused-attention.py", line 125, in call
+    kernel[grid](
+  File "/workspace/cuasmGA/autotuner.py", line 157, in run
+    ret = self.fn.search( #使用遗传算法搜索最优的 GPU 汇编调度策略
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/jit.py", line 247, in search
+    bin = run_selection(                    so_path,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/selection.py", line 103, in run_selection
+    torch.cuda.empty_cache()  # free test memory
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/cuasmGA/.venv/lib/python3.11/site-packages/torch/cuda/memory.py", line 159, in empty_cache
+    torch._C._cuda_emptyCache()
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+

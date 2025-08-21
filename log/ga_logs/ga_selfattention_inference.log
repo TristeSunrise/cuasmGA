@@ -1,0 +1,108 @@
+[1;32m2025-08-21 13:45:26,605 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347915952
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347146960
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347910928
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347910704
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347911408
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347915856
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347916240
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347155472
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347149200
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347146544
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347152176
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347151120
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347157488
+[93mJIT compile[0m
+[CompiledKernel] loading 134092347147088
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:00<00:00,  9.55it/s]100%|██████████| 10/10 [00:00<00:00, 79.16it/s]
+[1;32m2025-08-21 13:45:26,734 - INFO - ✅ kernel verified for 10 test samples (verify.py:235)[0m
+[1;32m2025-08-21 13:45:26,735 - INFO - run ga_kernel_0d1d2d34d5_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-21 13:45:26,735 - INFO - verification time: 0.13s (selection.py:113)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 134091832715152
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton    Flash-2
+0  4096.0  56.972647  54.977448  79.391197
+[1;32m2025-08-21 13:45:32,439 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 99.43it/s]100%|██████████| 10/10 [00:00<00:00, 99.17it/s]
+[1;32m2025-08-21 13:45:32,542 - INFO - ✅ kernel verified for 10 test samples (verify.py:235)[0m
+[1;32m2025-08-21 13:45:32,543 - INFO - run ga_kernel_0d1d2d34d5_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-21 13:45:32,543 - INFO - verification time: 0.10s (selection.py:113)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 139449975037360
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton   Flash-2
+0  4096.0  57.551403  62.804456  79.44008
+[1;32m2025-08-21 13:45:37,253 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 100.91it/s]
+[1;32m2025-08-21 13:45:37,355 - INFO - ✅ kernel verified for 10 test samples (verify.py:235)[0m
+[1;32m2025-08-21 13:45:37,356 - INFO - run ga_kernel_0d1d2d34d5_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-21 13:45:37,356 - INFO - verification time: 0.10s (selection.py:113)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 126525950795152
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton    Flash-2
+0  4096.0  63.669081  58.587988  79.690108
+[1;32m2025-08-21 13:45:42,168 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 99.76it/s]100%|██████████| 10/10 [00:00<00:00, 99.42it/s]
+[1;32m2025-08-21 13:45:42,272 - INFO - ✅ kernel verified for 10 test samples (verify.py:235)[0m
+[1;32m2025-08-21 13:45:42,273 - INFO - run ga_kernel_0d1d2d34d5_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-21 13:45:42,274 - INFO - verification time: 0.11s (selection.py:113)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 137619916332496
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton    Flash-2
+0  4096.0  57.858636  61.006244  78.646848
+[1;32m2025-08-21 13:45:46,947 - INFO - found 1 cubins in data/NVIDIA_A100-SXM4-80GB/flash_attn (selection.py:57)[0m
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 103.16it/s]
+[1;32m2025-08-21 13:45:47,047 - INFO - ✅ kernel verified for 10 test samples (verify.py:235)[0m
+[1;32m2025-08-21 13:45:47,048 - INFO - run ga_kernel_0d1d2d34d5_0.pkl verified ok (selection.py:106)[0m
+[1;32m2025-08-21 13:45:47,048 - INFO - verification time: 0.10s (selection.py:113)[0m
+[93mSIP JIT[0m
+TEST PASSED
+use flash: True; use fp8: False
+[BENCH]: fgk;; 1 4 4096 32
+[BENCH]: triton;; 1 4 4096 32
+[93mJIT compile[0m
+[CompiledKernel] loading 132359382424944
+[BENCH]: flash;; 1 4 4096 32
+fused-attention-batch1-head4-d32-fwd-causal=False:
+    N_CTX        FGK     Triton    Flash-2
+0  4096.0  57.817522  56.945627  79.341883
