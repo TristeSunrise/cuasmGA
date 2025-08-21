@@ -273,7 +273,7 @@ class TrionAutotunerWithCache(TritonAutotuner):
         return False
 
     def run(self, *args, **kwargs):
-        print("auto tunner with cache run")
+        #print("auto tunner with cache run")
         self.nargs = dict(zip(self.arg_names, args))
 
         if self.cache_config is not None:

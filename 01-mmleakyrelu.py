@@ -372,7 +372,7 @@ def main():
 
         if provider == 'cublas':
             ms = triton.testing.do_bench(lambda: torch.nn.functional.leaky_relu(torch.matmul(a, b)),warmup=100, rep=100,  quantiles=quantiles)
-        if provider == 'fgk':
+        if provider == 'ga':
             ms = triton.testing.do_bench(lambda: matmul(a, b, c, ga_kernel, M, N, K, grid, load_dir, "leaky_relu"), warmup=100, rep=100, quantiles=quantiles)
         if provider == 'triton':
             ms = triton.testing.do_bench(lambda: tt_matmul(a, b, c, M, N, K, grid, "leaky_relu"), warmup=100, rep=100, quantiles=quantiles)
