@@ -127,7 +127,7 @@ def call(kernel, load_dir, x, rms_w, eps=1e-6):
     return out
 
 
-if __name__ == '__main__':
+def main():
     ga_config = parse_args()
 
     random.seed(ga_config.seed)
@@ -212,9 +212,9 @@ if __name__ == '__main__':
             #x_vals=[2 ** i for i in range(8, 13)],  # Different possible values for `x_name`
             x_vals=[0],  # Different possible values for `x_name`
             line_arg="provider",  # Argument name whose value corresponds to a different line in the plot
-            line_vals=['ga', 'triton', 'torch'],
-            line_names=['ga', 'triton', 'torch'],
-            styles=[("green", "-"), ("blue", "-"), ('red', '-')],
+            line_vals=['ga', 'triton'],
+            line_names=['ga', 'triton'],
+            styles=[("green", "-"), ("blue", "-")],
             ylabel="TFLOPS",  # Label name for the y-axis
             plot_name='bmm',
             args={"fp8_inputs": None},
@@ -223,8 +223,6 @@ if __name__ == '__main__':
     @triton.testing.perf_report(configs)
     def benchmark(NA, provider, fp8_inputs):
         quantiles = [0.5, 0.2, 0.8]
-        if provider == 'torch':
-            ms, min_ms, max_ms = triton.testing.do_bench(lambda: rms_norm_pytorch(embeddings_load, rms_weights), quantiles=quantiles, warmup=100, rep=100)
         if provider == 'ga':
             ms, min_ms, max_ms = triton.testing.do_bench(lambda: call(_ga, load_dir, embeddings_load, rms_weights), quantiles=quantiles, warmup=100, rep=100)
         if provider == 'triton':
