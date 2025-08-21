@@ -2,7 +2,7 @@ import sys
 from collections import defaultdict, namedtuple
 
 from runga import run_ga
-from sassgen import run_selection
+from selection import run_selection
 from triton.runtime.jit import T, JITFunction, KernelArg, get_current_device, set_current_device, get_cuda_stream
 from triton.compiler.compiler import CompiledKernel, compile, get_arch_default_num_stages, get_arch_default_num_warps
 from triton.common.backend import get_backend, get_cuda_version_key
@@ -244,7 +244,21 @@ class ASMJITFunction(JITFunction):
                 )
                 sys.exit(0)  # signal that training is ok
             else:
-                bin = run_selection(cubin_dir_path=load_dir)
+                bin = run_selection(                    so_path,
+                    metadata,
+                    asm,
+                    args,
+                    sig_key,
+                    non_constexpr_arg_values,
+                    ret_ptr,
+
+                    grid_0,
+                    grid_1,
+                    grid_2,
+                    stream,  #
+
+                    cubin_dir_path=load_dir,
+                    n_test_samples=self.ga_config.n_tests,)
             warn = '\033[93m'
             end = '\033[0m'
             print(f"{warn}SIP JIT{end}")

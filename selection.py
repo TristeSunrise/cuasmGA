@@ -21,12 +21,11 @@ def run_selection(
 
     # args
     args, sig_key, non_constexpr_arg_values,
-    ret_ptr, test_inputs, test_outputs,
+    ret_ptr, 
 
     # kernel args
     grid_0, grid_1, grid_2, stream,
 
-    enter_hook, exit_hook,
 
     cubin_dir_path, n_test_samples,
 ):
