@@ -16,6 +16,8 @@ def plot_cuasmrl_ppo_ga_comparison(save_path=None):
         'fused_softmax': [483.13, 551.52, 378.93, 434.56, 249.53],
         # todo
         # 'flash_attention':
+        'flash_attention': [53.42 + 70.60 + 69.76 + 63.97 + 66.95] 
+
     }
 
     cuasmrl_ppo_results = {
@@ -23,6 +25,7 @@ def plot_cuasmrl_ppo_ga_comparison(save_path=None):
         'rmsnorm': [91.43, 81.80, 92.30, 92.34, 92.53],
         'batch_matmul': [27.91, 28.91, 29.01, 23.82, 20.82],
         'fused_softmax': [350.73, 316.86, 351.42, 303.53, 377.11],
+        'flash_attention': [65.37, 54.92, 58.37, 55.03, 60.36]
     }
 
     # GA performance data - from ga_inference2.log (matching kernels only)
@@ -31,6 +34,7 @@ def plot_cuasmrl_ppo_ga_comparison(save_path=None):
         'rmsnorm': [72.797557, 83.912931, 72.656319, 73.326993, 73.285994],
         'batch_matmul': [26.945389, 19.703738, 21.280227, 21.021203, 27.583889],
         'fused_softmax': [596.505593, 267.673783, 232.077535, 370.884496, 352.181127],
+        'flash_attention':[54.977448, 62.804456, 58.587988, 61.006244, 56.945627]
     }
 
     ga_results = {
@@ -38,6 +42,7 @@ def plot_cuasmrl_ppo_ga_comparison(save_path=None):
         'rmsnorm': [75.317912, 91.72288, 87.41047, 77.283019, 91.291664],
         'batch_matmul': [25.643434, 19.614755, 30.791107, 23.593118, 22.975794],
         'fused_softmax': [318.535666, 491.891278, 347.291918, 275.421353, 322.144053],
+        'flash_attention': [56.972647, 57.551403, 63.669081, 57.858636, 57.817522]
     }
 
     # Calculate improvement ratios correctly - pairwise comparison
