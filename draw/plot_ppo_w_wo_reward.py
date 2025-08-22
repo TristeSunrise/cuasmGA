@@ -89,7 +89,7 @@ def plot_corrected_grouped_boxplot_comparison(save_path=None):
     # Set labels and title
     # plt.xlabel('GPU Kernel Operations', fontsize=14, fontweight='bold')
     plt.ylabel('Normalized Throughput', fontsize=14, fontweight='bold')
-    plt.title('PPO Performance Comparison w/wo the feedback phase',
+    plt.title('PPO Performance Comparison w/wo the reward phase',
               fontsize=16, fontweight='bold', pad=20)
 
     # Set x-axis ticks and labels
