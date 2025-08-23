@@ -59,9 +59,14 @@ bash inference.sh 2>&1|tee inference.log
 ```
 # structure
 `autotuner.py` is the level of tuning the best kernel configuration(grid, block, threads...).
+
 `jit.py` is the level of searching the best optimized kernel in the inference process and will do the `runga` in the training process.
-`runga.py` is the entrance of calling the GA algorithm. The defination of `test_correctness` and `test_performance`. The best kernel is saved here.
+
+`runga.py` is the entrance of calling the GA algorithm. The defination of `test_correctness` and 
+`test_performance`. The best kernel is saved here.
+
 `decoder.py` to decode a single instruction into control code , operation and oprands .
+
 `newga.py` is the currently entire GA algorithm used, including the selection, crossover, mutation, and so on. Add the new function or modified old ones in this file.
 
 `sample.py` is the entrance of calling the stastic_analysis, every step of mutation and crossover will redo the stastic_analysis to uptate the movable instructions conditates.
