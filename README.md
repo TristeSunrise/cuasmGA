@@ -2,7 +2,7 @@
 
 #intsall
 
-'''
+```bash
 git clone https://github.com/TristeSunrise/cuasmGA.git
 
  
@@ -56,25 +56,25 @@ rm train.log
 bash train.sh 2>&1|tee train.log
 rm inference.log
 bash inference.sh 2>&1|tee inference.log
-'''
+```
 # structure
-'autotuner.py' is the level of tuning the best kernel configuration(grid, block, threads...).
-'jit.py' is the level of searching the best optimized kernel in the inference process and will do the 'runga' in the training process.
-'runga.py' is the entrance of calling the GA algorithm. The defination of 'test_correctness' and 'test_performance'. The best kernel is saved here.
-'decoder.py' to decode a single instruction into control code , operation and oprands .
-'newga.py' is the currently entire GA algorithm used, including the selection, crossover, mutation, and so on. Add the new function or modified old ones in this file.
+`autotuner.py` is the level of tuning the best kernel configuration(grid, block, threads...).
+`jit.py` is the level of searching the best optimized kernel in the inference process and will do the `runga` in the training process.
+`runga.py` is the entrance of calling the GA algorithm. The defination of `test_correctness` and `test_performance`. The best kernel is saved here.
+`decoder.py` to decode a single instruction into control code , operation and oprands .
+`newga.py` is the currently entire GA algorithm used, including the selection, crossover, mutation, and so on. Add the new function or modified old ones in this file.
 
-'sample.py' is the entrance of calling the stastic_analysis, every step of mutation and crossover will redo the stastic_analysis to uptate the movable instructions conditates.
+`sample.py` is the entrance of calling the stastic_analysis, every step of mutation and crossover will redo the stastic_analysis to uptate the movable instructions conditates.
 
-'gpu_utils.py' is the utils function used in the this projrct to get memory instructions and banne  operations.
+`gpu_utils.py` is the utils function used in the this projrct to get memory instructions and banne  operations.
 
-'selection.py' is to seltect the best kernel saved in the save path. Modify the path in the config class of every kernel you want.
+`selection.py` is to seltect the best kernel saved in the save path. Modify the path in the config class of every kernel you want.
 
-'sass_kernel.py' is to locate the kernel section in the whole sass file and to update the optimized kernel section, embedding it back into the sass file.
+`sass_kernel.py` is to locate the kernel section in the whole sass file and to update the optimized kernel section, embedding it back into the sass file.
 
-'sassgen.py' is the only file calling the CuAsmbler to convert the sass file into the binary cubin file or reversely.  
+`sassgen.py` is the only file calling the CuAsmbler to convert the sass file into the binary cubin file or reversely.  
 
-'verify.py' is to verify the valiation of a kernel.
+`verify.py` is to verify the valiation of a kernel.
 
-currently aborted files: 'safe_mem_mover.py' (failed to analysis the computing instruction dependency) and 'ga' (original version of the randomly disrupted instruction sequence).
+currently aborted files: `safe_mem_mover.py` (failed to analysis the computing instruction dependency) and `ga` (original version of the randomly disrupted instruction sequence).
 
