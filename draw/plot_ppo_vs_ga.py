@@ -14,9 +14,7 @@ def plot_cuasmrl_ppo_ga_comparison(save_path=None):
         'rmsnorm': [74.75, 72.90, 73.27, 72.88, 73.51],
         'batch_matmul': [19.89, 29.36, 30.54, 27.13, 32.15],
         'fused_softmax': [483.13, 551.52, 378.93, 434.56, 249.53],
-        # todo
-        # 'flash_attention':
-        'flash_attention': [53.42 + 70.60 + 69.76 + 63.97 + 66.95] 
+        'flash_attention': [53.42, 70.60, 69.76, 63.97, 66.95]
 
     }
 
@@ -34,7 +32,7 @@ def plot_cuasmrl_ppo_ga_comparison(save_path=None):
         'rmsnorm': [72.797557, 83.912931, 72.656319, 73.326993, 73.285994],
         'batch_matmul': [26.945389, 19.703738, 21.280227, 21.021203, 27.583889],
         'fused_softmax': [596.505593, 267.673783, 232.077535, 370.884496, 352.181127],
-        'flash_attention':[54.977448, 62.804456, 58.587988, 61.006244, 56.945627]
+        'flash_attention': [54.977448, 62.804456, 58.587988, 61.006244, 56.945627]
     }
 
     ga_results = {
@@ -46,7 +44,7 @@ def plot_cuasmrl_ppo_ga_comparison(save_path=None):
     }
 
     # Calculate improvement ratios correctly - pairwise comparison
-    common_kernels = ['mm_leakyrelu', 'rmsnorm', 'batch_matmul', 'fused_softmax']
+    common_kernels = ['mm_leakyrelu', 'rmsnorm', 'batch_matmul', 'fused_softmax', 'flash_attention']
 
     ppo_ratios = {}
     ga_ratios = {}
